@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Calendar Component Test</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+        }
+        .test-title {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .test-section {
+            margin-bottom: 30px;
+        }
+        .test-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #f59e0b;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+        }
+        .error {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+        .date-display {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        // Simple mock of our DatePicker component for testing
+        const DatePickerTest = () => {
+            const [selectedDate, setSelectedDate] = useState(null);
+            const [testStatus, setTestStatus] = useState('Loading...');
+            const [error, setError] = useState(null);
+            
+            useEffect(() => {
+                try {
+                    setTestStatus('✅ React components loaded successfully');
+                } catch (err) {
+                    setError('❌ Failed to load React components: ' + err.message);
+                }
+            }, []);
+            
+            const handleDateSelect = (date) => {
+                setSelectedDate(date);
+                setTestStatus(`✅ Date selected: ${date.toLocaleDateString()}`);
+            };
+            
+            return (
+                <div className="container">
+                    <h1 className="test-title">🗓️ Calendar Component Test</h1>
+                    
+                    <div className="test-section">
+                        <label className="test-label">Birthday Selection Test:</label>
+                        <div style={{
+                            padding: '12px',
+                            border: '1px solid #64748b',
+                            borderRadius: '8px',
+                            background: 'rgba(0, 0, 0, 0.2)',
+                            cursor: 'pointer'
+                        }} onClick={() => {
+                            // Simulate clicking the date picker
+                            const today = new Date();
+                            const testDate = new Date(today.getFullYear() - 25, 5, 15); // 25 years ago
+                            handleDateSelect(testDate);
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span>📅</span>
+                                <span style={{ color: selectedDate ? 'white' : '#9ca3af' }}>
+                                    {selectedDate ? selectedDate.toLocaleDateString() : 'Select your birthday for special treats'}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        {selectedDate && (
+                            <div className="date-display">
+                                <strong>Selected Date:</strong><br/>
+                                {JSON.stringify({
+                                    date: selectedDate.toLocaleDateString(),
+                                    iso: selectedDate.toISOString(),
+                                    valid: selectedDate instanceof Date && !isNaN(selectedDate)
+                                }, null, 2)}
+                            </div>
+                        )}
+                    </div>
+                    
+                    <div className="test-section">
+                        <label className="test-label">Component Status:</label>
+                        <div className={`status ${error ? 'error' : ''}`}>
+                            {error || testStatus}
+                        </div>
+                    </div>
+                    
+                    <div className="test-section">
+                        <label className="test-label">Expected Behavior:</label>
+                        <ul style={{ color: '#d1d5db', fontSize: '14px', lineHeight: '1.6' }}>
+                            <li>✅ Should show a calendar icon</li>
+                            <li>✅ Should open a calendar popover when clicked</li>
+                            <li>✅ Should allow date selection</li>
+                            <li>✅ Should handle birthday dates (past dates)</li>
+                            <li>✅ Should format dates properly</li>
+                            <li>✅ Should work with form validation</li>
+                        </ul>
+                    </div>
+                    
+                    <div className="test-section">
+                        <button 
+                            onClick={() => {
+                                setSelectedDate(null);
+                                setTestStatus('Test reset. Click the date field above to test.');
+                                setError(null);
+                            }}
+                            style={{
+                                background: 'linear-gradient(45deg, #f59e0b, #d97706)',
+                                border: 'none',
+                                color: 'white',
+                                padding: '10px 20px',
+                                borderRadius: '8px',
+                                cursor: 'pointer',
+                                fontWeight: '500'
+                            }}
+                        >
+                            Reset Test
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+        
+        ReactDOM.render(<DatePickerTest />, document.getElementById('root'));
+    </script>
+</body>
+</html>

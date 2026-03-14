@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reservation {{status}} - {{restaurant_name}}</title>
+  <style>
+    /* Modern email template styles */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #ffffff;
+      background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #2d2d2d 100%);
+      padding: 20px 0;
+      min-height: 100vh;
+    }
+    
+    .email-container {
+      max-width: 650px;
+      margin: 0 auto;
+      background: #1f1f1f;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+      border: 2px solid #f59e0b;
+    }
+    
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+      padding: 40px 30px;
+      text-align: center;
+      border-bottom: 3px solid #f59e0b;
+    }
+    
+    .logo h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      letter-spacing: 3px;
+      color: #f59e0b;
+      text-shadow: 2px 2px 8px rgba(245, 158, 11, 0.3);
+    }
+    
+    .logo p {
+      font-size: 1.2rem;
+      color: #d1d5db;
+      font-weight: 500;
+      opacity: 0.9;
+    }
+    
+    /* Status badge */
+    .status-badge {
+      display: inline-block;
+      padding: 8px 20px;
+      border-radius: 25px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-top: 15px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+    }
+    
+    /* Content */
+    .content {
+      padding: 45px 35px;
+      background: #1f1f1f;
+    }
+    
+    .greeting {
+      font-size: 1.4rem;
+      color: #ffffff;
+      margin-bottom: 25px;
+      font-weight: 600;
+    }
+    
+    .intro-text {
+      font-size: 1.1rem;
+      color: #d1d5db;
+      margin-bottom: 35px;
+      line-height: 1.8;
+    }
+    
+    /* Enhanced Reservation Card */
+    .reservation-card {
+      background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+      border: 2px solid #f59e0b;
+      border-radius: 16px;
+      padding: 35px;
+      margin: 35px 0;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    
+    .card-title {
+      color: #f59e0b;
+      font-size: 1.5rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .booking-id {
+      background: #f59e0b;
+      color: #1f1f1f;
+      padding: 6px 15px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    
+    .detail-grid {
+      display: grid;
+      gap: 20px;
+    }
+    
+    .detail-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 18px 0;
+      border-bottom: 1px solid #6b7280;
+      transition: all 0.3s ease;
+    }
+    
+    .detail-item:last-child {
+      border-bottom: none;
+    }
+    
+    .detail-label {
+      font-weight: 600;
+      color: #d1d5db;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1rem;
+      min-width: 140px;
+    }
+    
+    .detail-value {
+      font-weight: 600;
+      color: #ffffff;
+      font-size: 1.1rem;
+      text-align: right;
+      flex: 1;
+    }
+    
+    /* Special requests section */
+    .special-requests {
+      background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+      border-left: 4px solid #f59e0b;
+      border-radius: 8px;
+      padding: 25px;
+      margin: 25px 0;
+    }
+    
+    .special-requests h4 {
+      color: #f59e0b;
+      margin-bottom: 15px;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .special-requests p {
+      color: #d1d5db;
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+    
+    /* Restaurant Details */
+    .restaurant-details {
+      background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+      border-radius: 12px;
+      padding: 30px;
+      margin: 30px 0;
+      border: 1px solid #6b7280;
+    }
+    
+    .detail-title {
+      color: #f59e0b;
+      font-weight: 700;
+      margin-bottom: 20px;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .info-grid {
+      display: grid;
+      gap: 15px;
+    }
+    
+    .info-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 12px 0;
+      border-bottom: 1px solid #6b7280;
+    }
+    
+    .info-item:last-child {
+      border-bottom: none;
+    }
+    
+    .info-label {
+      color: #d1d5db;
+      font-weight: 500;
+      min-width: 120px;
+    }
+    
+    .info-value {
+      color: #ffffff;
+      font-weight: 600;
+      text-align: right;
+      flex: 1;
+    }
+    
+    /* Enhanced Promotion Banner */
+    .promo-banner {
+      background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+      border-radius: 16px;
+      padding: 30px;
+      margin: 35px 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 15px 40px rgba(245, 158, 11, 0.3);
+    }
+    
+    .promo-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #1f1f1f;
+      margin-bottom: 10px;
+    }
+    
+    .promo-text {
+      color: #1f1f1f;
+      font-weight: 500;
+      font-size: 1.1rem;
+      line-height: 1.5;
+    }
+    
+    /* Contact Section */
+    .contact-section {
+      background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+      border: 1px solid #f59e0b;
+      border-radius: 16px;
+      padding: 30px;
+      margin: 35px 0;
+      text-align: center;
+    }
+    
+    .contact-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .contact-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin: 25px 0;
+    }
+    
+    .contact-item {
+      background: rgba(245, 158, 11, 0.1);
+      padding: 20px;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+    
+    .contact-item strong {
+      color: #f59e0b;
+      font-weight: 600;
+      font-size: 1.1rem;
+      display: block;
+      margin-top: 8px;
+    }
+    
+    .contact-item span {
+      color: #d1d5db;
+      font-size: 1.2rem;
+    }
+    
+    /* CTA Button */
+    .cta-container {
+      text-align: center;
+      margin: 45px 0;
+    }
+    
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+      color: #1f1f1f;
+      padding: 18px 45px;
+      text-decoration: none;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      box-shadow: 0 10px 30px rgba(245, 158, 11, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      transition: all 0.3s ease;
+    }
+    
+    /* Footer */
+    .footer {
+      background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+      color: white;
+      padding: 45px 35px;
+      text-align: center;
+      border-top: 3px solid #f59e0b;
+    }
+    
+    .footer-title {
+      color: #f59e0b;
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .hours-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin: 25px 0;
+    }
+    
+    .hours-item {
+      background: rgba(245, 158, 11, 0.1);
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    
+    .hours-item strong {
+      color: #f59e0b;
+      display: block;
+      margin-bottom: 5px;
+    }
+    
+    .social-links {
+      margin: 30px 0;
+    }
+    
+    .social-links a {
+      color: #f59e0b;
+      text-decoration: none;
+      margin: 0 20px;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    
+    .footer-info {
+      font-size: 0.95rem;
+      opacity: 0.8;
+      margin-top: 30px;
+      line-height: 1.8;
+      color: #d1d5db;
+    }
+    
+    .footer-info a {
+      color: #f59e0b;
+      text-decoration: none;
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 650px) {
+      body { padding: 10px 0; }
+      .email-container { margin: 0 10px; border-radius: 16px; }
+      .header, .content, .footer { padding: 30px 25px; }
+      .logo h1 { font-size: 2.2rem; letter-spacing: 2px; }
+      .reservation-card, .contact-section, .promo-banner, .restaurant-details { padding: 25px; }
+      
+      .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+      
+      .detail-item, .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      
+      .detail-label, .info-label {
+        min-width: auto;
+      }
+      
+      .detail-value, .info-value {
+        text-align: left;
+      }
+      
+      .contact-info, .hours-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .cta-button {
+        padding: 16px 35px;
+        font-size: 1rem;
+        letter-spacing: 1px;
+      }
+      
+      .footer-title, .contact-title, .detail-title {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">
+        <h1>{{restaurant_name}}</h1>
+        <p>{{restaurant_tagline}}</p>
+      </div>
+      <div class="status-badge">{{status}}</div>
+    </div>
+    
+    <!-- Content -->
+    <div class="content">
+      <div class="greeting">Dear {{to_name}},</div>
+      
+      <p class="intro-text">{{message}}</p>
+      
+      <!-- Reservation Details Card -->
+      <div class="reservation-card">
+        <div class="card-header">
+          <h3 class="card-title">
+            <span>📋</span>
+            Reservation Details
+          </h3>
+          <div class="booking-id">ID: {{booking_id}}</div>
+        </div>
+        
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">📅 Date</span>
+            <span class="detail-value">{{reservation_date}}</span>
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-label">🕐 Time</span>
+            <span class="detail-value">{{time}}</span>
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-label">👥 Party Size</span>
+            <span class="detail-value">{{party_size}}</span>
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-label">📍 Location</span>
+            <span class="detail-value">{{location}}</span>
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-label">🍹 Welcome Drink</span>
+            <span class="detail-value">{{welcome_drink}}</span>
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-label">🎉 Occasion</span>
+            <span class="detail-value">{{occasion}}</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Special Requests Section -->
+      <div class="special-requests">
+        <h4>✨ Special Requests</h4>
+        <p>{{special_requests}}</p>
+      </div>
+      
+      <!-- Restaurant Details -->
+      <div class="restaurant-details">
+        <h3 class="detail-title">🏢 Restaurant Information</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">👔 Dress Code:</span>
+            <span class="info-value">{{dress_code}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">🅿️ Parking:</span>
+            <span class="info-value">{{parking}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">📞 Phone:</span>
+            <span class="info-value">{{phone}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">✉️ Email:</span>
+            <span class="info-value">{{email_contact}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">❌ Cancellation:</span>
+            <span class="info-value">{{cancellation_policy}}</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Promotion Banner -->
+      <div class="promo-banner">
+        <div class="promo-title">🍖 Special Offer!</div>
+        <div class="promo-text">
+          Complimentary Goat Meat every Friday & Saturday<br>
+          6:00 PM - 9:00 PM
+        </div>
+      </div>
+      
+      <!-- Contact Information -->
+      <div class="contact-section">
+        <div class="contact-title">📞 Need to make changes?</div>
+        <div class="contact-info">
+          <div class="contact-item">
+            <span>📞</span>
+            <strong>{{phone}}</strong>
+          </div>
+          <div class="contact-item">
+            <span>✉️</span>
+            <strong>{{email_contact}}</strong>
+          </div>
+        </div>
+      </div>
+      
+      <!-- CTA Button -->
+      <div class="cta-container">
+        <a href="tel:{{phone}}" class="cta-button">Call to Confirm</a>
+      </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="footer">
+      <h3 class="footer-title">🕐 Opening Hours</h3>
+      <div class="hours-container">
+        <div class="hours-item">
+          <strong>Monday - Friday</strong>
+          8:00 AM - 12:00 AM
+        </div>
+        <div class="hours-item">
+          <strong>Saturday - Sunday</strong>
+          7:00 AM - 11:00 PM
+        </div>
+      </div>
+      
+      <div class="social-links">
+        <a href="{{social_facebook}}">Facebook</a>
+        <a href="{{social_instagram}}">Instagram</a>
+        <a href="{{social_twitter}}">Twitter</a>
+      </div>
+      
+      <div class="footer-info">
+        © {{current_year}} {{restaurant_name}}. All Rights Reserved.<br>
+        {{location}}<br>
+        Visit us at <a href="{{website}}">{{website}}</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="x-apple-disable-message-reformatting">
+  <title>Reservation {{status}} - {{restaurant_name}}</title>
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+  <style>
+    /* CSS Reset for email clients */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    /* Prevent Webkit from resizing text */
+    body, table, td, p, a, li, blockquote {
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+    }
+    
+    /* Remove extra space added in Outlook */
+    table, td {
+      mso-table-lspace: 0pt;
+      mso-table-rspace: 0pt;
+    }
+    
+    /* Fix for Gmail not displaying borders correctly */
+    img {
+      -ms-interpolation-mode: bicubic;
+      border: 0;
+      display: block;
+      outline: none;
+      text-decoration: none;
+    }
+    
+    /* Base styles with fluid typography */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #ffffff;
+      background: #0f0f0f;
+      margin: 0;
+      padding: 0;
+      width: 100% !important;
+      min-width: 100%;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    /* Main container with mobile-first approach */
+    .email-wrapper {
+      width: 100%;
+      background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #2d2d2d 100%);
+      padding: 20px 0;
+      min-height: 100vh;
+    }
+    
+    .email-container {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      background: #1f1f1f;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+      border: 2px solid #f59e0b;
+    }
+    
+    /* Fluid container for mobile */
+    .fluid-container {
+      width: 100%;
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+    
+    /* Header with enhanced mobile optimization */
+    .header {
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+      padding: 30px 20px;
+      text-align: center;
+      border-bottom: 3px solid #f59e0b;
+    }
+    
+    .logo h1 {
+      font-size: clamp(1.8rem, 4vw + 1rem, 2.8rem); /* Fluid typography */
+      font-weight: 800;
+      margin-bottom: 8px;
+      letter-spacing: 2px;
+      color: #f59e0b;
+      text-shadow: 2px 2px 8px rgba(245, 158, 11, 0.3);
+      word-break: break-word; /* Prevent overflow */
+    }
+    
+    .logo p {
+      font-size: clamp(1rem, 2vw + 0.5rem, 1.2rem);
+      color: #d1d5db;
+      font-weight: 500;
+      opacity: 0.9;
+    }
+    
+    /* Status badge with mobile optimization */
+    .status-badge {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: clamp(0.8rem, 1.5vw + 0.5rem, 0.9rem);
+      font-weight: 600;
+      margin-top: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+      white-space: nowrap;
+    }
+    
+    /* Content with mobile-first padding */
+    .content {
+      padding: 30px 20px;
+      background: #1f1f1f;
+    }
+    
+    .greeting {
+      font-size: clamp(1.1rem, 2.5vw + 0.8rem, 1.4rem);
+      color: #ffffff;
+      margin-bottom: 20px;
+      font-weight: 600;
+      word-break: break-word;
+    }
+    
+    .intro-text {
+      font-size: clamp(0.95rem, 1.8vw + 0.7rem, 1.1rem);
+      color: #d1d5db;
+      margin-bottom: 25px;
+      line-height: 1.7;
+    }
+    
+    /* Ultra-responsive reservation card */
+    .reservation-card {
+      background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+      border: 2px solid #f59e0b;
+      border-radius: 16px;
+      padding: 25px 20px;
+      margin: 25px 0;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    
+    .card-header {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 20px;
+      align-items: flex-start;
+    }
+    
+    .card-title {
+      color: #f59e0b;
+      font-size: clamp(1.2rem, 2.2vw + 0.8rem, 1.5rem);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      word-break: break-word;
+    }
+    
+    .booking-id {
+      background: #f59e0b;
+      color: #1f1f1f;
+      padding: 6px 12px;
+      border-radius: 15px;
+      font-size: clamp(0.75rem, 1.2vw + 0.5rem, 0.85rem);
+      font-weight: 600;
+      white-space: nowrap;
+      align-self: flex-start;
+    }
+    
+    /* Mobile-first detail layout */
+    .detail-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 16px 0;
+      border-bottom: 1px solid #6b7280;
+    }
+    
+    .detail-item:last-child {
+      border-bottom: none;
+    }
+    
+    .detail-label {
+      font-weight: 600;
+      color: #d1d5db;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: clamp(0.9rem, 1.5vw + 0.6rem, 1rem);
+    }
+    
+    .detail-value {
+      font-weight: 600;
+      color: #ffffff;
+      font-size: clamp(1rem, 1.8vw + 0.7rem, 1.1rem);
+      word-break: break-word;
+    }
+    
+    /* Special requests optimized for mobile */
+    .special-requests {
+      background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+      border-left: 4px solid #f59e0b;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    
+    .special-requests h4 {
+      color: #f59e0b;
+      margin-bottom: 12px;
+      font-size: clamp(1rem, 2vw + 0.7rem, 1.2rem);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .special-requests p {
+      color: #d1d5db;
+      line-height: 1.6;
+      font-size: clamp(0.9rem, 1.5vw + 0.6rem, 1rem);
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+    
+    /* Restaurant details with mobile layout */
+    .restaurant-details {
+      background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+      border: 1px solid #6b7280;
+    }
+    
+    .detail-title {
+      color: #f59e0b;
+      font-weight: 700;
+      margin-bottom: 16px;
+      font-size: clamp(1.1rem, 2vw + 0.8rem, 1.3rem);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .info-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 12px 0;
+      border-bottom: 1px solid #6b7280;
+    }
+    
+    .info-item:last-child {
+      border-bottom: none;
+    }
+    
+    .info-label {
+      color: #d1d5db;
+      font-weight: 500;
+      font-size: clamp(0.85rem, 1.3vw + 0.6rem, 0.95rem);
+    }
+    
+    .info-value {
+      color: #ffffff;
+      font-weight: 600;
+      font-size: clamp(0.9rem, 1.5vw + 0.6rem, 1rem);
+      word-break: break-all;
+    }
+    
+    /* Mobile-optimized promotion banner */
+    .promo-banner {
+      background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 25px 0;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(245, 158, 11, 0.3);
+    }
+    
+    .promo-title {
+      font-size: clamp(1.1rem, 2.2vw + 0.8rem, 1.4rem);
+      font-weight: 700;
+      color: #1f1f1f;
+      margin-bottom: 8px;
+    }
+    
+    .promo-text {
+      color: #1f1f1f;
+      font-weight: 500;
+      font-size: clamp(0.95rem, 1.8vw + 0.7rem, 1.1rem);
+      line-height: 1.4;
+    }
+    
+    /* Contact section with stacked mobile layout */
+    .contact-section {
+      background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+      border: 1px solid #f59e0b;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 25px 0;
+      text-align: center;
+    }
+    
+    .contact-title {
+      font-size: clamp(1.1rem, 2vw + 0.8rem, 1.3rem);
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .contact-info {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .contact-item {
+      background: rgba(245, 158, 11, 0.1);
+      padding: 16px;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+    }
+    
+    .contact-item span {
+      font-size: clamp(1.1rem, 2vw + 0.8rem, 1.2rem);
+    }
+    
+    .contact-item strong {
+      color: #f59e0b;
+      font-weight: 600;
+      font-size: clamp(0.9rem, 1.5vw + 0.6rem, 1rem);
+      word-break: break-all;
+    }
+    
+    /* Ultra-mobile-friendly CTA button */
+    .cta-container {
+      text-align: center;
+      margin: 30px 0;
+      padding: 0 10px;
+    }
+    
+    .cta-button {
+      display: block;
+      width: 100%;
+      max-width: 280px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+      color: #1f1f1f;
+      padding: 16px 20px;
+      text-decoration: none;
+      border-radius: 25px;
+      font-weight: 700;
+      font-size: clamp(1rem, 1.8vw + 0.7rem, 1.1rem);
+      box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-align: center;
+      min-height: 48px; /* Touch-friendly */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Footer with mobile-optimized layout */
+    .footer {
+      background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+      border-top: 3px solid #f59e0b;
+    }
+    
+    .footer-title {
+      color: #f59e0b;
+      font-size: clamp(1.1rem, 2.2vw + 0.8rem, 1.4rem);
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .hours-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 20px 0;
+    }
+    
+    .hours-item {
+      background: rgba(245, 158, 11, 0.1);
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      text-align: center;
+    }
+    
+    .hours-item strong {
+      color: #f59e0b;
+      display: block;
+      margin-bottom: 4px;
+      font-size: clamp(0.9rem, 1.5vw + 0.6rem, 1rem);
+    }
+    
+    .hours-item span {
+      font-size: clamp(0.85rem, 1.3vw + 0.6rem, 0.95rem);
+    }
+    
+    .social-links {
+      margin: 25px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .social-links a {
+      color: #f59e0b;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: clamp(1rem, 1.8vw + 0.7rem, 1.1rem);
+      padding: 8px;
+      display: block;
+    }
+    
+    .footer-info {
+      font-size: clamp(0.85rem, 1.3vw + 0.6rem, 0.95rem);
+      opacity: 0.8;
+      margin-top: 25px;
+      line-height: 1.6;
+      color: #d1d5db;
+    }
+    
+    .footer-info a {
+      color: #f59e0b;
+      text-decoration: none;
+      word-break: break-all;
+    }
+    
+    /* Enhanced breakpoints for better responsiveness */
+    @media only screen and (min-width: 480px) {
+      .email-wrapper { padding: 25px 15px; }
+      .email-container { border-radius: 20px; }
+      .content { padding: 35px 25px; }
+      .header, .footer { padding: 35px 25px; }
+      
+      .contact-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      
+      .social-links {
+        flex-direction: row;
+        justify-content: center;
+        gap: 20px;
+      }
+      
+      .hours-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+    }
+    
+    @media only screen and (min-width: 600px) {
+      .email-wrapper { padding: 30px 20px; }
+      .content { padding: 45px 35px; }
+      .header, .footer { padding: 40px 35px; }
+      
+      .card-header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+      
+      .booking-id {
+        align-self: auto;
+      }
+      
+      .detail-item, .info-item {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+      
+      .detail-value, .info-value {
+        text-align: right;
+        flex: 1;
+        margin-left: 20px;
+      }
+      
+      .cta-button {
+        display: inline-block;
+        width: auto;
+        min-width: 200px;
+      }
+    }
+    
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+      .email-container {
+        border-color: #fbbf24;
+      }
+      
+      .status-badge, .promo-banner, .cta-button {
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      }
+    }
+    
+    /* High contrast support */
+    @media (prefers-contrast: high) {
+      .detail-item, .info-item {
+        border-bottom-color: #ffffff;
+      }
+      
+      .special-requests, .restaurant-details, .contact-section {
+        border-width: 2px;
+      }
+    }
+    
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        transition: none !important;
+        animation: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="email-wrapper">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+      <tr>
+        <td align="center">
+          <div class="email-container">
+            <!-- Header -->
+            <div class="header">
+              <div class="logo">
+                <h1>{{restaurant_name}}</h1>
+                <p>{{restaurant_tagline}}</p>
+              </div>
+              <div class="status-badge">{{status}}</div>
+            </div>
+            
+            <!-- Content -->
+            <div class="content">
+              <div class="greeting">Dear {{to_name}},</div>
+              
+              <p class="intro-text">{{message}}</p>
+              
+              <!-- Reservation Details Card -->
+              <div class="reservation-card">
+                <div class="card-header">
+                  <h3 class="card-title">
+                    <span>📋</span>
+                    Reservation Details
+                  </h3>
+                  <div class="booking-id">ID: {{booking_id}}</div>
+                </div>
+                
+                <div class="detail-grid">
+                  <div class="detail-item">
+                    <span class="detail-label">📅 Date</span>
+                    <span class="detail-value">{{reservation_date}}</span>
+                  </div>
+                  
+                  <div class="detail-item">
+                    <span class="detail-label">🕐 Time</span>
+                    <span class="detail-value">{{time}}</span>
+                  </div>
+                  
+                  <div class="detail-item">
+                    <span class="detail-label">👥 Party Size</span>
+                    <span class="detail-value">{{party_size}}</span>
+                  </div>
+                  
+                  <div class="detail-item">
+                    <span class="detail-label">📍 Location</span>
+                    <span class="detail-value">{{location}}</span>
+                  </div>
+                  
+                  <div class="detail-item">
+                    <span class="detail-label">🍹 Welcome Drink</span>
+                    <span class="detail-value">{{welcome_drink}}</span>
+                  </div>
+                  
+                  <div class="detail-item">
+                    <span class="detail-label">🎉 Occasion</span>
+                    <span class="detail-value">{{occasion}}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Special Requests Section -->
+              <div class="special-requests">
+                <h4>✨ Special Requests</h4>
+                <p>{{special_requests}}</p>
+              </div>
+              
+              <!-- Restaurant Details -->
+              <div class="restaurant-details">
+                <h3 class="detail-title">🏢 Restaurant Information</h3>
+                <div class="info-grid">
+                  <div class="info-item">
+                    <span class="info-label">👔 Dress Code:</span>
+                    <span class="info-value">{{dress_code}}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">🅿️ Parking:</span>
+                    <span class="info-value">{{parking}}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">📞 Phone:</span>
+                    <span class="info-value">{{phone}}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">✉️ Email:</span>
+                    <span class="info-value">{{email_contact}}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">❌ Cancellation:</span>
+                    <span class="info-value">{{cancellation_policy}}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Promotion Banner -->
+              <div class="promo-banner">
+                <div class="promo-title">🍖 Special Offer!</div>
+                <div class="promo-text">
+                  Complimentary Goat Meat every Friday & Saturday<br>
+                  6:00 PM - 9:00 PM
+                </div>
+              </div>
+              
+              <!-- Contact Information -->
+              <div class="contact-section">
+                <div class="contact-title">📞 Need to make changes?</div>
+                <div class="contact-info">
+                  <div class="contact-item">
+                    <span>📞</span>
+                    <strong>{{phone}}</strong>
+                  </div>
+                  <div class="contact-item">
+                    <span>✉️</span>
+                    <strong>{{email_contact}}</strong>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- CTA Button -->
+              <div class="cta-container">
+                <a href="tel:{{phone}}" class="cta-button">Call to Confirm</a>
+              </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="footer">
+              <h3 class="footer-title">🕐 Opening Hours</h3>
+              <div class="hours-container">
+                <div class="hours-item">
+                  <strong>Monday - Friday</strong>
+                  <span>8:00 AM - 12:00 AM</span>
+                </div>
+                <div class="hours-item">
+                  <strong>Saturday - Sunday</strong>
+                  <span>7:00 AM - 11:00 PM</span>
+                </div>
+              </div>
+              
+              <div class="social-links">
+                <a href="{{social_facebook}}">Facebook</a>
+                <a href="{{social_instagram}}">Instagram</a>
+                <a href="{{social_twitter}}">Twitter</a>
+              </div>
+              
+              <div class="footer-info">
+                © {{current_year}} {{restaurant_name}}. All Rights Reserved.<br>
+                {{location}}<br>
+                Visit us at <a href="{{website}}">{{website}}</a>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+</body>
+</html>

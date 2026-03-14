@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="format-detection" content="telephone=yes">
+  <meta name="x-apple-disable-message-reformatting">
+  <title>Reservation {{status}} - AM | PM Lounge</title>
+  <style>
+    /* Ultra-clean, minimalistic email template with perfect mobile responsiveness */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    /* Fluid typography that scales perfectly */
+    html {
+      font-size: calc(14px + 0.5vw);
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      line-height: 1.6;
+      color: #ffffff;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+      padding: clamp(10px, 3vw, 20px) 0;
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+    }
+    
+    .email-container {
+      max-width: min(600px, 95vw);
+      margin: 0 auto;
+      background: #1f1f1f;
+      border-radius: clamp(12px, 2.5vw, 16px);
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      border: 1px solid #f59e0b;
+      width: 100%;
+    }
+    
+    /* Header with fluid scaling */
+    .header {
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+      padding: clamp(25px, 6vw, 40px) clamp(20px, 5vw, 30px);
+      text-align: center;
+      color: white;
+      position: relative;
+      border-bottom: 3px solid #f59e0b;
+    }
+    
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="%23f59e0b" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="%23f59e0b" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="%23f59e0b" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+      opacity: 0.3;
+    }
+    
+    .logo {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .logo h1 {
+      font-size: clamp(1.8rem, 5vw, 2.5rem);
+      font-weight: 700;
+      margin-bottom: clamp(6px, 1.5vw, 8px);
+      letter-spacing: clamp(1px, 0.4vw, 2px);
+      color: #fbbf24;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      word-break: break-word;
+    }
+    
+    .logo p {
+      font-size: clamp(1rem, 2.5vw, 1.1rem);
+      opacity: 0.9;
+      font-style: italic;
+      color: #cccccc;
+    }
+    
+    /* Status badge */
+    .status-badge {
+      display: inline-block;
+      padding: clamp(6px, 2vw, 8px) clamp(15px, 4vw, 20px);
+      border-radius: 25px;
+      font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+      font-weight: 600;
+      margin-top: clamp(10px, 3vw, 15px);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+      max-width: 90%;
+      word-break: break-word;
+    }
+    
+    /* Content with responsive padding */
+    .content {
+      padding: clamp(25px, 6vw, 40px) clamp(20px, 5vw, 30px);
+      background: #1f1f1f;
+    }
+    
+    .greeting {
+      font-size: clamp(1.2rem, 3.5vw, 1.3rem);
+      color: #ffffff;
+      margin-bottom: clamp(15px, 3vw, 20px);
+      font-weight: 600;
+      word-break: break-word;
+    }
+    
+    .intro-text {
+      font-size: clamp(1rem, 2.8vw, 1.1rem);
+      color: #cccccc;
+      margin-bottom: clamp(20px, 4vw, 30px);
+      line-height: 1.7;
+    }
+    
+    /* Reservation Card - ultra-responsive */
+    .reservation-card {
+      background: linear-gradient(135deg, #2a2a2a 0%, #333333 100%);
+      border: 2px solid #f59e0b;
+      border-radius: clamp(8px, 2vw, 12px);
+      padding: clamp(20px, 5vw, 30px);
+      margin: clamp(20px, 4vw, 30px) 0;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .reservation-card::before {
+      content: '📍';
+      position: absolute;
+      top: clamp(-15px, -2vw, -10px);
+      right: clamp(-15px, -2vw, -10px);
+      font-size: clamp(3rem, 6vw, 4rem);
+      opacity: 0.2;
+    }
+    
+    .card-title {
+      color: #f59e0b;
+      font-size: clamp(1.2rem, 3.5vw, 1.4rem);
+      font-weight: 700;
+      margin-bottom: clamp(15px, 3vw, 20px);
+      display: flex;
+      align-items: center;
+      gap: clamp(8px, 2vw, 10px);
+      flex-wrap: wrap;
+    }
+    
+    .detail-grid {
+      display: grid;
+      gap: clamp(10px, 2.5vw, 15px);
+    }
+    
+    .detail-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: clamp(12px, 2.5vw, 15px) 0;
+      border-bottom: 1px solid #444444;
+      transition: all 0.3s ease;
+      gap: clamp(10px, 3vw, 15px);
+    }
+    
+    .detail-item:last-child {
+      border-bottom: none;
+    }
+    
+    .detail-item:hover {
+      background: rgba(245, 158, 11, 0.1);
+      margin: 0 clamp(-10px, -2vw, -15px);
+      padding: clamp(12px, 2.5vw, 15px);
+      border-radius: clamp(6px, 1.5vw, 8px);
+    }
+    
+    .detail-label {
+      font-weight: 600;
+      color: #cccccc;
+      display: flex;
+      align-items: center;
+      gap: clamp(6px, 1.5vw, 8px);
+      font-size: clamp(0.9rem, 2.2vw, 1rem);
+      min-width: clamp(80px, 20vw, 120px);
+      flex-shrink: 0;
+    }
+    
+    .detail-value {
+      font-weight: 500;
+      color: #ffffff;
+      font-size: clamp(0.95rem, 2.5vw, 1rem);
+      text-align: right;
+      word-break: break-word;
+      flex: 1;
+    }
+    
+    /* Special requests - only show if content exists */
+    .special-requests {
+      background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+      border-left: 4px solid #f59e0b;
+      border-radius: clamp(6px, 1.5vw, 8px);
+      padding: clamp(15px, 3vw, 20px);
+      margin: clamp(15px, 3vw, 20px) 0;
+    }
+    
+    .special-requests h4 {
+      color: #f59e0b;
+      margin-bottom: clamp(8px, 2vw, 10px);
+      font-size: clamp(1rem, 2.8vw, 1.1rem);
+      display: flex;
+      align-items: center;
+      gap: clamp(6px, 1.5vw, 8px);
+    }
+    
+    .special-requests p {
+      color: #d1d5db;
+      line-height: 1.6;
+      font-size: clamp(0.9rem, 2.3vw, 1rem);
+      word-break: break-word;
+    }
+    
+    /* Promotion Banner */
+    .promo-banner {
+      background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+      border-radius: clamp(8px, 2vw, 12px);
+      padding: clamp(20px, 4vw, 25px);
+      margin: clamp(20px, 4vw, 30px) 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    }
+    
+    .promo-banner::before {
+      content: '🍖';
+      position: absolute;
+      top: clamp(-25px, -4vw, -20px);
+      right: clamp(-25px, -4vw, -20px);
+      font-size: clamp(4rem, 8vw, 6rem);
+      opacity: 0.3;
+    }
+    
+    .promo-title {
+      font-size: clamp(1.1rem, 3vw, 1.3rem);
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: clamp(6px, 1.5vw, 8px);
+    }
+    
+    .promo-text {
+      color: #1a1a1a;
+      font-weight: 500;
+      font-size: clamp(0.95rem, 2.5vw, 1rem);
+      line-height: 1.5;
+    }
+    
+    /* Contact Info */
+    .contact-info {
+      background: #2a2a2a;
+      border: 1px solid #f59e0b;
+      border-radius: clamp(8px, 2vw, 12px);
+      padding: clamp(20px, 4vw, 25px);
+      margin: clamp(20px, 4vw, 30px) 0;
+    }
+    
+    .contact-title {
+      font-size: clamp(1.1rem, 3vw, 1.2rem);
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: clamp(12px, 2.5vw, 15px);
+    }
+    
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: clamp(8px, 2vw, 12px);
+      margin: clamp(8px, 2vw, 12px) 0;
+      font-size: clamp(1rem, 2.8vw, 1.1rem);
+      color: #cccccc;
+      flex-wrap: wrap;
+    }
+    
+    .contact-item strong {
+      color: #f59e0b;
+      word-break: break-all;
+    }
+    
+    /* CTA Button - perfectly mobile optimized */
+    .cta-container {
+      text-align: center;
+      margin: clamp(30px, 6vw, 40px) 0;
+    }
+    
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+      color: #1a1a1a;
+      padding: clamp(12px, 3vw, 16px) clamp(25px, 6vw, 40px);
+      text-decoration: none;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: clamp(0.95rem, 2.8vw, 1.1rem);
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+      text-transform: uppercase;
+      letter-spacing: clamp(0.5px, 0.2vw, 1px);
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-width: min(280px, 85%);
+      margin: 0 auto;
+    }
+    
+    .cta-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 35px rgba(245, 158, 11, 0.4);
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    }
+    
+    /* Footer */
+    .footer {
+      background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+      color: white;
+      padding: clamp(25px, 5vw, 40px) clamp(20px, 5vw, 30px);
+      text-align: center;
+      border-top: 2px solid #f59e0b;
+    }
+    
+    .footer-title {
+      color: #fbbf24;
+      font-size: clamp(1.2rem, 3.5vw, 1.3rem);
+      font-weight: 600;
+      margin-bottom: clamp(12px, 2.5vw, 15px);
+    }
+    
+    .hours-text {
+      font-size: clamp(0.95rem, 2.5vw, 1rem);
+      line-height: 1.8;
+      margin-bottom: clamp(20px, 4vw, 30px);
+      opacity: 0.9;
+      color: #cccccc;
+    }
+    
+    .social-links {
+      margin: clamp(20px, 4vw, 25px) 0;
+    }
+    
+    .social-links a {
+      color: #f59e0b;
+      text-decoration: none;
+      margin: 0 clamp(10px, 2.5vw, 15px);
+      font-weight: 500;
+      font-size: clamp(0.95rem, 2.5vw, 1rem);
+      transition: color 0.3s ease;
+      display: inline-block;
+      padding: clamp(4px, 1vw, 6px);
+    }
+    
+    .social-links a:hover {
+      color: #fbbf24;
+    }
+    
+    .footer-info {
+      font-size: clamp(0.85rem, 2.2vw, 0.9rem);
+      opacity: 0.7;
+      margin-top: clamp(20px, 4vw, 25px);
+      line-height: 1.6;
+      color: #cccccc;
+    }
+    
+    /* Perfect mobile breakpoints */
+    @media (max-width: 600px) {
+      body { 
+        padding: 10px 0; 
+      }
+      
+      .email-container { 
+        margin: 0 10px; 
+        border-radius: 12px; 
+      }
+      
+      .header, .content, .footer { 
+        padding: 25px 20px; 
+      }
+      
+      .logo h1 { 
+        font-size: 2rem; 
+        letter-spacing: 1px;
+      }
+      
+      .reservation-card, .contact-info, .promo-banner { 
+        padding: 20px; 
+      }
+      
+      .detail-item { 
+        flex-direction: column; 
+        align-items: flex-start; 
+        gap: 8px; 
+      }
+      
+      .detail-label {
+        min-width: auto;
+      }
+      
+      .detail-value {
+        text-align: left;
+      }
+      
+      .cta-button { 
+        padding: 14px 30px; 
+        font-size: 1rem; 
+        width: 90%;
+        max-width: none;
+      }
+      
+      .contact-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+      }
+      
+      .social-links a {
+        display: block;
+        margin: 8px 0;
+      }
+    }
+    
+    @media (max-width: 400px) {
+      .email-container {
+        margin: 0 5px;
+        max-width: calc(100vw - 10px);
+      }
+      
+      .card-title {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+    }
+    
+    /* Large screen enhancements */
+    @media (min-width: 768px) {
+      .detail-item:hover {
+        transform: translateX(2px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">
+        <h1>{{restaurant_name}}</h1>
+        <p>{{restaurant_tagline}}</p>
+      </div>
+      <div class="status-badge">{{status}}</div>
+    </div>
+    
+    <!-- Content -->
+    <div class="content">
+      <div class="greeting">Dear {{to_name}},</div>
+      
+      <p class="intro-text">{{message}}</p>
+      
+      <!-- Reservation Details Card -->
+      <div class="reservation-card">
+        <h3 class="card-title">
+          <span>📍</span>
+          Reservation Details
+        </h3>
+        
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">📅 Date</span>
+            <span class="detail-value">{{reservation_date}}</span>
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-label">🕐 Time</span>
+            <span class="detail-value">{{time}}</span>
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-label">👥 Party Size</span>
+            <span class="detail-value">{{party_size}}</span>
+          </div>
+          
+          <div class="detail-item">
+            <span class="detail-label">📍 Location</span>
+            <span class="detail-value">{{location}}</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Special Requests Section (only if exists) -->
+      <div class="special-requests">
+        <h4>✨ Special Requests</h4>
+        <p>{{special_requests}}</p>
+      </div>
+      
+      <!-- Promotion Banner -->
+      <div class="promo-banner">
+        <div class="promo-title">🍖 Special Offer!</div>
+        <div class="promo-text">
+          Complimentary Goat Meat every Friday & Saturday<br>
+          6:00 PM - 9:00 PM
+        </div>
+      </div>
+      
+      <!-- Contact Information -->
+      <div class="contact-info">
+        <div class="contact-title">Need to make changes?</div>
+        <div class="contact-item">
+          📞 <strong>{{phone}}</strong>
+        </div>
+        <div class="contact-item">
+          ✉️ <strong>{{email_contact}}</strong>
+        </div>
+      </div>
+      
+      <!-- CTA Button -->
+      <div class="cta-container">
+        <a href="tel:{{phone}}" class="cta-button">Call to Confirm</a>
+      </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="footer">
+      <h3 class="footer-title">Opening Hours</h3>
+      <div class="hours-text">
+        Monday - Friday: 8:00 AM - 12:00 AM<br>
+        Saturday - Sunday: 7:00 AM - 11:00 PM
+      </div>
+      
+      <div class="social-links">
+        <a href="{{social_facebook}}">Facebook</a>
+        <a href="{{social_instagram}}">Instagram</a>
+        <a href="{{social_twitter}}">Twitter</a>
+      </div>
+      
+      <div class="footer-info">
+        © {{current_year}} {{restaurant_name}}. All Rights Reserved.<br>
+        {{location}}
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,132 @@
+"use client";
+
+import { CartItem } from "@/types/pos.types";
+import { Trash2, Minus, Plus, CreditCard } from "lucide-react";
+import { formatCurrency } from "@/lib/utils";
+
+interface CartSidebarProps {
+    cart: CartItem[];
+    onUpdateQuantity: (id: string, delta: number) => void;
+    onRemove: (id: string) => void;
+    onCheckout: () => void;
+    onAddToTab: () => void;
+}
+
+export const CartSidebar = ({ cart, onUpdateQuantity, onRemove, onCheckout, onAddToTab }: CartSidebarProps) => {
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    // Prices are VAT-inclusive, no separate tax calculation needed
+    const total = subtotal;
+
+    return (
+        <div className="flex h-full flex-col bg-neutral-900 border-l border-white/10 w-[400px]">
+            {/* Header */}
+            <div className="p-6 border-b border-white/10">
+                <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                    Current Order
+                    <span className="bg-emerald-500/20 text-emerald-400 text-xs px-2 py-1 rounded-full border border-emerald-500/20">
+                        {cart.length} items
+                    </span>
+                </h2>
+            </div>
+
+            {/* Cart Items - Scrollable area */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                {cart.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-full text-neutral-500 space-y-4">
+                        <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center">
+                            <CreditCard className="w-8 h-8 opacity-50" />
+                        </div>
+                        <p>No items in order</p>
+                    </div>
+                ) : (
+                    cart.map((item, index) => (
+                        <div
+                            key={item.$id}
+                            className="group relative flex gap-3 bg-white/5 hover:bg-white/10 rounded-xl p-3 border border-transparent hover:border-white/10 transition-all cart-item-enter"
+                            style={{ animationDelay: `${index * 0.05}s` }}
+                        >
+                            {/* Quantity Controls */}
+                            <div className="flex flex-col items-center justify-between bg-black/20 rounded-lg w-8 py-1">
+                                <button
+                                    onClick={() => onUpdateQuantity(item.$id, 1)}
+                                    className="p-1 hover:text-emerald-400 transition-colors"
+                                >
+                                    <Plus size={14} />
+                                </button>
+                                <span className="text-sm font-bold">{item.quantity}</span>
+                                <button
+                                    onClick={() => onUpdateQuantity(item.$id, -1)}
+                                    className="p-1 hover:text-rose-400 transition-colors"
+                                >
+                                    <Minus size={14} />
+                                </button>
+                            </div>
+
+                            {/* Item Details */}
+                            <div className="flex-1 min-w-0 py-1">
+                                <div className="flex justify-between items-start">
+                                    <h4 className="font-medium text-neutral-200 truncate pr-2">
+                                        {item.name}
+                                    </h4>
+                                    <span className="font-bold text-emerald-400 whitespace-nowrap">
+                                        {formatCurrency(item.price * item.quantity)}
+                                    </span>
+                                </div>
+                                <div className="text-xs text-neutral-500 mt-1">
+                                    {formatCurrency(item.price)} each
+                                </div>
+                            </div>
+
+                            {/* Remove Button */}
+                            <button
+                                onClick={() => onRemove(item.$id)}
+                                className="opacity-0 group-hover:opacity-100 absolute -right-2 -top-2 bg-rose-500 text-white p-1.5 rounded-full shadow-lg hover:bg-rose-600 transition-all scale-75 group-hover:scale-100"
+                            >
+                                <Trash2 size={14} />
+                            </button>
+                        </div>
+                    ))
+                )}
+            </div>
+
+            {/* Totals Section */}
+            <div className="bg-neutral-800/50 p-6 space-y-4 border-t border-white/10 backdrop-blur-sm">
+                <div className="space-y-2 text-sm">
+                    <div className="flex justify-between text-neutral-400">
+                        <span>Subtotal</span>
+                        <span>{formatCurrency(subtotal)}</span>
+                    </div>
+                    <div className="text-xs text-neutral-500 italic">
+                        *Prices include VAT
+                    </div>
+                </div>
+
+                <div className="pt-4 border-t border-white/10 space-y-3">
+                    <div className="flex justify-between items-end">
+                        <span className="text-neutral-300">Total</span>
+                        <span className="text-3xl font-bold text-white">
+                            {formatCurrency(total)}
+                        </span>
+                    </div>
+
+                    <button
+                        onClick={onAddToTab}
+                        disabled={cart.length === 0}
+                        className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-neutral-700 disabled:cursor-not-allowed text-white text-lg font-bold py-3 rounded-xl shadow-lg shadow-emerald-900/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                    >
+                        Add To Tab
+                    </button>
+
+                    <button
+                        onClick={onCheckout}
+                        disabled={cart.length === 0}
+                        className="w-full bg-neutral-100 hover:bg-white text-neutral-900 disabled:bg-neutral-800 disabled:text-neutral-500 disabled:cursor-not-allowed text-sm font-semibold py-3 rounded-xl border border-white/10 transition-all flex items-center justify-center gap-2"
+                    >
+                        <CreditCard className="w-4 h-4" />
+                        Process Payment
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};

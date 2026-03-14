@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reservation {{status}}</title>
+</head>
+
+<body style="margin:0; padding:0; background:#1a1a1d;">
+
+  <!-- OUTLOOK GRADIENT FIX -->
+  <!--[if gte mso 9]>
+  <v:background fill="t">
+    <v:fill type="gradient" angle="145" color="#1a1a1d" color2="#2b1a0f" />
+  </v:background>
+  <![endif]-->
+
+  <!-- Outer Wrapper (Gradient Background for Gmail + others) -->
+  <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0"
+         style="background: linear-gradient(145deg,#1a1a1d,#0c0c0f,#000000,#2b1a0f); padding:40px 0;">
+    <tr>
+      <td align="center">
+
+        <!-- Email Container -->
+        <table role="presentation" width="650" cellspacing="0" cellpadding="0" border="0"
+               style="width:90%; max-width:650px; background:rgba(255,255,255,0.08);
+               border-radius:20px; border:1px solid rgba(255,255,255,0.15); backdrop-filter:none;">
+          <tr>
+            <td style="padding:30px; font-family:Arial, sans-serif; color:#ffffff;">
+
+              <!-- HEADER -->
+              <h1 style="margin:0; text-align:center; font-size:24px; color:#ffa043;">
+                {{status}}
+              </h1>
+
+              <p style="text-align:center; font-size:14px; color:#cccccc; margin:15px 0 25px;">
+                {{message}}
+              </p>
+
+              <!-- RESERVATION CARD -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0"
+                     style="background:rgba(255,255,255,0.06); border-radius:16px;
+                     padding:20px; border:1px solid rgba(255,255,255,0.1);">
+                <tr>
+                  <td style="font-family:Arial, sans-serif;">
+
+                    <h2 style="margin:0 0 15px; font-size:18px; font-weight:bold; color:#ffffff;">
+                      📋 Reservation Details
+                    </h2>
+
+                    <!-- Full Name -->
+                    <table width="100%" cellspacing="0" cellpadding="0" style="margin-bottom:12px;">
+                      <tr>
+                        <td style="font-size:12px; text-transform:uppercase; color:#ffae5c;">👤 Full Name</td>
+                      </tr>
+                      <tr>
+                        <td style="font-size:14px; color:#ffffff; padding-top:3px;">
+                          {{to_name}}
+                        </td>
+                      </tr>
+                    </table>
+
+                    <!-- Date -->
+                    <table width="100%" cellspacing="0" cellpadding="0" style="margin-bottom:12px;">
+                      <tr>
+                        <td style="font-size:12px; text-transform:uppercase; color:#ffae5c;">📅 Date</td>
+                      </tr>
+                      <tr>
+                        <td style="font-size:14px; color:#ffffff; padding-top:3px;">
+                          {{reservation_date}}
+                        </td>
+                      </tr>
+                    </table>
+
+                    <!-- Time -->
+                    <table width="100%" cellspacing="0" cellpadding="0" style="margin-bottom:12px;">
+                      <tr>
+                        <td style="font-size:12px; text-transform:uppercase; color:#ffae5c;">⏰ Time</td>
+                      </tr>
+                      <tr>
+                        <td style="font-size:14px; color:#ffffff; padding-top:3px;">
+                          {{time}}
+                        </td>
+                      </tr>
+                    </table>
+
+                    <!-- Party Size -->
+                    <table width="100%" cellspacing="0" cellpadding="0" style="margin-bottom:12px;">
+                      <tr>
+                        <td style="font-size:12px; text-transform:uppercase; color:#ffae5c;">👥 Party Size</td>
+                      </tr>
+                      <tr>
+                        <td style="font-size:14px; color:#ffffff; padding-top:3px;">
+                          {{party_size}}
+                        </td>
+                      </tr>
+                    </table>
+
+                    <!-- Location -->
+                    <table width="100%" cellspacing="0" cellpadding="0" style="margin-bottom:12px;">
+                      <tr>
+                        <td style="font-size:12px; text-transform:uppercase; color:#ffae5c;">📍 Location</td>
+                      </tr>
+                      <tr>
+                        <td style="font-size:14px; color:#ffffff; padding-top:3px;">
+                          {{location}}
+                        </td>
+                      </tr>
+                    </table>
+
+                    <!-- Welcome Drink -->
+                    <table width="100%" cellspacing="0" cellpadding="0" style="margin-bottom:12px;">
+                      <tr>
+                        <td style="font-size:12px; text-transform:uppercase; color:#ffae5c;">🍹 Welcome Drink</td>
+                      </tr>
+                      <tr>
+                        <td style="font-size:14px; color:#ffffff; padding-top:3px;">
+                          {{welcome_drink}}
+                        </td>
+                      </tr>
+                    </table>
+
+                    <!-- Occasion -->
+                    <table width="100%" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td style="font-size:12px; text-transform:uppercase; color:#ffae5c;">🎉 Occasion</td>
+                      </tr>
+                      <tr>
+                        <td style="font-size:14px; color:#ffffff; padding-top:3px;">
+                          {{occasion}}
+                        </td>
+                      </tr>
+                    </table>
+
+                  </td>
+                </tr>
+              </table>
+
+              <!-- SPECIAL REQUESTS -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0"
+                style="margin-top:25px; background:rgba(139,92,246,0.12);
+                border:1px solid rgba(139,92,246,0.3); border-radius:16px; padding:18px;">
+                <tr>
+                  <td>
+                    <h3 style="margin:0 0 8px; font-size:16px; color:#c4b5fd;">
+                      ✨ Special Requests
+                    </h3>
+                    <p style="margin:0; color:#f3f4f6; font-size:14px;">
+                      {{special_requests}}
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- PROMO BANNER -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0"
+                style="margin-top:25px; background:rgba(255,153,51,0.18);
+                border-radius:16px; border:1px solid rgba(255,153,51,0.3); padding:15px;">
+                <tr>
+                  <td align="center" style="font-size:14px; color:#ffffff;">
+                    🎉 <strong style="color:#ff9f2f;">Enjoy 10% off</strong> on your first order when you dine with us —
+                    show this message at the counter!
+                  </td>
+                </tr>
+              </table>
+
+              <!-- CONTACT SECTION -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0"
+                style="margin-top:30px; background:rgba(255,255,255,0.05);
+                border-radius:16px; border:1px solid rgba(255,255,255,0.1); padding:18px;">
+                <tr>
+                  <td align="center" style="font-size:16px; color:#ffa043; font-weight:bold;">
+                    Need to make changes?
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding-top:12px;">
+
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                      <tr>
+
+                        <td align="center"
+                          style="padding:10px; font-size:14px; color:#ffa043; border-radius:10px;
+                          background:rgba(255,153,51,0.1); border:1px solid rgba(255,153,51,0.2);">
+                          📞 {{phone}}
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td align="center"
+                          style="padding:10px; margin-top:10px; font-size:14px; color:#ffa043;
+                          border-radius:10px; background:rgba(255,153,51,0.1);
+                          border:1px solid rgba(255,153,51,0.2);">
+                          ✉️ {{email_contact}}
+                        </td>
+                      </tr>
+
+                    </table>
+
+                  </td>
+                </tr>
+
+                <!-- CTA BUTTON -->
+                <tr>
+                  <td align="center" style="padding-top:20px;">
+                    <a href="tel:{{phone}}"
+                      style="display:inline-block; background:#ffa043; color:#1a1a1a;
+                      padding:12px 28px; text-decoration:none; border-radius:25px;
+                      font-weight:bold; font-size:14px; text-transform:uppercase;">
+                      Call to Confirm
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- FOOTER -->
+              <p style="margin-top:30px; font-size:12px; text-align:center; color:#aaaaaa;">
+                Thank you for choosing {{restaurant_name}}!  
+                For inquiries, <a href="mailto:{{email_contact}}"
+                style="color:#ffa043; text-decoration:none;">contact us</a>.
+              </p>
+
+              <p style="margin:5px 0; text-align:center; font-size:12px; color:#aaaaaa;">
+                {{location}}
+              </p>
+
+              <p style="margin:5px 0; text-align:center; font-size:12px; color:#aaaaaa;">
+                © {{current_year}} {{restaurant_name}}. All rights reserved.
+              </p>
+
+            </td>
+          </tr>
+        </table>
+
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

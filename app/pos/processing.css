@@ -1,0 +1,42 @@
+/**
+ * Processing Overlay Animation Styles
+ * Instant feedback for payment processing
+ */
+
+/* Fade in animation - instant */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 200ms ease-out forwards;
+}
+
+/* Scale bounce for success checkmark */
+@keyframes scaleBounce {
+    0% {
+        transform: scale(0);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.animate-scale-bounce {
+    animation: scaleBounce 500ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Ensure smooth 60fps animations */
+.animate-spin,
+.animate-pulse,
+.animate-bounce {
+    will-change: transform, opacity;
+}
