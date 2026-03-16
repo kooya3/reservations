@@ -88,15 +88,24 @@ export default function ReceiptPage({ params }: { params: Promise<{ orderId: str
         );
     }
 
+    // Check if order is paid - includes both "paid" and "settled" status
+    // "settled" is used for child orders that were consolidated into a table tab
+    const paymentStatus = order.paymentStatus?.toLowerCase?.();
+    const orderStatus = order.status?.toLowerCase?.();
     const isPaid =
-        order.paymentStatus?.toLowerCase?.() === "paid" ||
-        order.status?.toLowerCase?.() === "paid";
+        paymentStatus === "paid" ||
+        paymentStatus === "settled" ||  // Child orders in a tab settlement
+        orderStatus === "paid";
 
-    const paymentLabel = order.paymentStatus
-        ? order.paymentStatus.toUpperCase()
-        : isPaid
-        ? "PAID"
-        : "UNPAID";
+    // Determine display label for payment status
+    // Show "PAID" for both "paid" and "settled" statuses to avoid confusing customers
+    let paymentLabel: string;
+    if (order.paymentStatus) {
+        const upperStatus = order.paymentStatus.toUpperCase();
+        paymentLabel = upperStatus === "SETTLED" ? "PAID" : upperStatus;
+    } else {
+        paymentLabel = isPaid ? "PAID" : "UNPAID";
+    }
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-emerald-100 py-8 px-4 animate-fade-in">
