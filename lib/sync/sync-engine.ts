@@ -3,7 +3,7 @@
  * Handles synchronization between local IndexedDB and cloud Appwrite
  */
 
-import { localDb, generateChecksum, getCurrentTimestamp, type SyncQueueItem, type SyncMetadata, type LocalGuest, type LocalReservation, type LocalMenuItem, type LocalTable, type LocalOrder, type LocalPayment } from '../local-db';
+import { localDb, generateChecksum, getCurrentTimestamp, isDBReady, type SyncQueueItem, type SyncMetadata, type LocalGuest, type LocalReservation, type LocalMenuItem, type LocalTable, type LocalOrder, type LocalPayment } from '../local-db';
 
 // ============================================================================
 // Configuration
@@ -12,6 +12,23 @@ import { localDb, generateChecksum, getCurrentTimestamp, type SyncQueueItem, typ
 const SYNC_INTERVAL = 45 * 60 * 1000; // 45 minutes
 const MAX_RETRIES = 3;
 const RETRY_DELAYS = [1000, 5000, 15000]; // Exponential backoff
+
+// Global flag to track if DB is ready
+let dbReady = false;
+
+/**
+ * Set DB ready flag
+ */
+export function setDBReady(ready: boolean) {
+  dbReady = ready;
+}
+
+/**
+ * Check if DB operations are safe
+ */
+function checkDB(): boolean {
+  return dbReady && isDBReady();
+}
 
 // ============================================================================
 // Types
@@ -82,6 +99,7 @@ export async function getPendingSyncItems(): Promise<SyncQueueItem[]> {
  * Get count of pending sync items
  */
 export async function getPendingSyncCount(): Promise<number> {
+  if (!isDBReady()) return 0;
   return localDb.syncQueue.count();
 }
 
@@ -89,6 +107,7 @@ export async function getPendingSyncCount(): Promise<number> {
  * Remove item from sync queue
  */
 export async function removeSyncQueueItem(id: string): Promise<void> {
+  if (!isDBReady()) return;
   await localDb.syncQueue.delete(id);
 }
 

@@ -10,7 +10,7 @@ import { initializeLocalDB, clearLocalDB } from '@/lib/local-db';
 import { initializeNetworkMonitor, getNetworkStatus, isOnline } from '@/lib/sync/network-monitor';
 import { initializeSessionManager, validateSession, getCurrentSession, endSession } from '@/lib/auth/session-manager';
 import { performInitialSync, seedDefaultData, isFirstRun, markInitialSyncComplete } from '@/lib/sync/initial-sync';
-import { getPendingSyncCount, triggerImmediateSync, type SyncResult } from '@/lib/sync/sync-engine';
+import { getPendingSyncCount, triggerImmediateSync, setDBReady, type SyncResult } from '@/lib/sync/sync-engine';
 import type { NetworkStatus } from '@/lib/sync/network-monitor';
 
 // ============================================================================
@@ -67,11 +67,16 @@ export function useOffline(options: UseOfflineOptions = {}): UseOfflineReturn {
 
       // Initialize local database
       try {
-        await initializeLocalDB();
-        console.log('✅ Local database initialized');
+        const dbInitialized = await initializeLocalDB();
+        if (dbInitialized) {
+          setDBReady(true);
+          console.log('✅ Local database initialized');
+        } else {
+          console.warn('⚠️ Local database failed to initialize - running in cloud-only mode');
+        }
       } catch (dbError) {
         console.warn('⚠️ Local DB init warning:', dbError);
-        // Continue anyway - IndexedDB might not be available
+        // Continue anyway - app works in cloud-only mode
       }
 
       // Check if first run

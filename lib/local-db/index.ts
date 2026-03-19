@@ -336,9 +336,37 @@ export function getCurrentTimestamp(): string {
 /**
  * Initialize the local database
  */
-export async function initializeLocalDB(): Promise<void> {
-  await localDb.open();
-  console.log('📦 Local database initialized');
+export async function initializeLocalDB(): Promise<boolean> {
+  try {
+    // Check if already open
+    if (localDb.isOpen()) {
+      console.log('📦 Local database already open');
+      return true;
+    }
+    
+    // Open the database
+    await localDb.open();
+    
+    // Verify it's open by checking a table
+    await localDb.tables.count();
+    
+    console.log('📦 Local database initialized');
+    return true;
+  } catch (error) {
+    console.error('❌ Failed to initialize local database:', error);
+    return false;
+  }
+}
+
+/**
+ * Check if database is ready
+ */
+export function isDBReady(): boolean {
+  try {
+    return localDb.isOpen();
+  } catch {
+    return false;
+  }
 }
 
 /**
