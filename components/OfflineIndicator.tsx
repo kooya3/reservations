@@ -2,8 +2,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Wifi, WifiOff, RefreshCw, Clock, AlertTriangle } from 'lucide-react';
-import { getNetworkStatus, type NetworkStatus } from '@/lib/sync/network-monitor';
-import { getPendingSyncCount, triggerImmediateSync, getSyncStatus } from '@/lib/sync/sync-engine';
 
 // ============================================================================
 // Types
@@ -14,6 +12,9 @@ interface OfflineIndicatorProps {
   showDetails?: boolean;
   onSyncClick?: () => void;
 }
+
+type NetworkStatus = 'online' | 'offline' | 'checking';
+type SyncStatus = 'idle' | 'syncing' | 'error' | 'offline';
 
 // ============================================================================
 // Component
@@ -28,25 +29,47 @@ export default function OfflineIndicator({
   const [pendingCount, setPendingCount] = useState(0);
   const [lastSyncTime, setLastSyncTime] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
-  const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'error' | 'offline'>('idle');
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
+  const [isClient, setIsClient] = useState(false);
+
+  // Set client side
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Update status periodically
   useEffect(() => {
+    if (!isClient) return;
+
     const updateStatus = async () => {
-      const status = getNetworkStatus();
-      setNetworkStatus(status.status);
+      try {
+        // Try to get network status - safe import
+        const { getNetworkStatus } = await import('@/lib/sync/network-monitor');
+        const status = getNetworkStatus();
+        setNetworkStatus(status.status);
+      } catch (e) {
+        // Fallback to navigator.onLine
+        setNetworkStatus(typeof navigator !== 'undefined' && navigator.onLine ? 'online' : 'offline');
+      }
       
-      const count = await getPendingSyncCount();
-      setPendingCount(count);
-      
-      setSyncStatus(getSyncStatus() as 'idle' | 'syncing' | 'error' | 'offline');
+      try {
+        const { getPendingSyncCount } = await import('@/lib/sync/sync-engine');
+        const count = await getPendingSyncCount();
+        setPendingCount(count);
+        
+        const { getSyncStatus } = await import('@/lib/sync/sync-engine');
+        setSyncStatus(getSyncStatus() as SyncStatus);
+      } catch (e) {
+        // Sync engine not initialized yet
+        setPendingCount(0);
+      }
     };
 
     updateStatus();
     const interval = setInterval(updateStatus, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [isClient]);
 
   // Handle manual sync
   const handleSync = useCallback(async () => {
