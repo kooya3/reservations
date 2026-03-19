@@ -7,7 +7,7 @@ import { ClerkProvider } from '@clerk/nextjs';
 import { neobrutalism } from '@clerk/themes';
 
 import { cn } from "@/lib/utils";
-import { OfflineProvider } from "@/components/OfflineProvider";
+// import { OfflineProvider } from "@/components/OfflineProvider"; // Temporarily disabled for testing
 
 
 const fontSans = FontSans({
@@ -49,9 +49,7 @@ export default function RootLayout({
           )}
         >
           <ThemeProvider attribute="class" defaultTheme="dark">
-            <OfflineProvider>
-              {children}
-            </OfflineProvider>
+            {children}
             <Analytics />
           </ThemeProvider>
         </body>
