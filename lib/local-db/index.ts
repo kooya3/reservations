@@ -415,7 +415,7 @@ export function getCurrentTimestamp(): string {
 export async function initializeLocalDB(): Promise<boolean> {
   try {
     // Check if already open
-    if (localDb.isOpen()) {
+    if (localDb.isOpen) {
       console.log('📦 Local database already open');
       return true;
     }
@@ -438,11 +438,7 @@ export async function initializeLocalDB(): Promise<boolean> {
  * Check if database is ready
  */
 export function isDBReady(): boolean {
-  try {
-    return localDb.isOpen();
-  } catch {
-    return false;
-  }
+  return localDb.isOpen;
 }
 
 /**

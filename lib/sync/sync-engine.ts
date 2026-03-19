@@ -27,7 +27,7 @@ export function setDBReady(ready: boolean) {
  * Check if DB operations are safe
  */
 function checkDB(): boolean {
-  return dbReady && isDBReady();
+  return dbReady && isDBReady;
 }
 
 // ============================================================================
