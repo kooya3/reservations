@@ -170,7 +170,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ orderId: str
                                     <td className="py-2 pr-2">{item.quantity} x </td>
                                     <td className="py-2 pr-2">{item.name}</td>
                                     <td className="py-2 text-right whitespace-nowrap">{formatCurrency(item.price)}</td>
-                                    <td className="py-2 text-right whitespace-nowrap">= {formatCurrency(item.price * item.quantity)}</td>
+                                    <td className="py-2 text-right whitespace-nowrap">{formatCurrency(item.price * item.quantity)}</td>
                                 </tr>
                             ))}
                         </tbody>
