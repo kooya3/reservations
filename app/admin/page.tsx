@@ -11,7 +11,10 @@ import {
   Utensils,
   Wine,
   AlertCircle,
-  ShoppingCart
+  ShoppingCart,
+  DollarSign,
+  Receipt,
+  Calculator
 } from "lucide-react";
 import Link from "next/link";
 
@@ -23,9 +26,18 @@ import { getAdminAnalytics } from "@/lib/actions/admin.actions";
 import { useLiveReservationMetrics } from "@/lib/hooks/useLiveReservationMetrics";
 import { useLivePOSMetrics } from "@/lib/hooks/useLivePOSMetrics";
 
+// Report components
+import SalesReport from "@/components/reports/SalesReport";
+import AccountingDashboard from "@/components/reports/AccountingDashboard";
+import VATDashboard from "@/components/reports/VATDashboard";
+import ExpensesManager from "@/components/reports/ExpensesManager";
+
+type TabType = 'dashboard' | 'sales' | 'accounting' | 'vat' | 'expenses';
+
 const AdminPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [combinedAnalytics, setCombinedAnalytics] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<TabType>('dashboard');
 
   // Initialize with default data
   const defaultReservationData = {
@@ -163,7 +175,70 @@ const AdminPage = () => {
         </header>
 
         <main className="mx-auto max-w-[1600px] px-6 py-8">
-          {/* Welcome Section with Live Time */}
+          {/* Navigation Tabs */}
+          <div className="mb-6">
+            <nav className="flex gap-2 border-b border-gray-700 pb-px">
+              <button
+                onClick={() => setActiveTab('dashboard')}
+                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === 'dashboard'
+                    ? 'border-amber-500 text-amber-500'
+                    : 'border-transparent text-gray-400 hover:text-white'
+                }`}
+              >
+                <Activity className="w-4 h-4" />
+                Dashboard
+              </button>
+              <button
+                onClick={() => setActiveTab('sales')}
+                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === 'sales'
+                    ? 'border-amber-500 text-amber-500'
+                    : 'border-transparent text-gray-400 hover:text-white'
+                }`}
+              >
+                <Receipt className="w-4 h-4" />
+                Sales Reports
+              </button>
+              <button
+                onClick={() => setActiveTab('accounting')}
+                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === 'accounting'
+                    ? 'border-amber-500 text-amber-500'
+                    : 'border-transparent text-gray-400 hover:text-white'
+                }`}
+              >
+                <DollarSign className="w-4 h-4" />
+                Accounting
+              </button>
+              <button
+                onClick={() => setActiveTab('vat')}
+                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === 'vat'
+                    ? 'border-amber-500 text-amber-500'
+                    : 'border-transparent text-gray-400 hover:text-white'
+                }`}
+              >
+                <Calculator className="w-4 h-4" />
+                VAT
+              </button>
+              <button
+                onClick={() => setActiveTab('expenses')}
+                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === 'expenses'
+                    ? 'border-amber-500 text-amber-500'
+                    : 'border-transparent text-gray-400 hover:text-white'
+                }`}
+              >
+                <ShoppingCart className="w-4 h-4" />
+                Expenses
+              </button>
+            </nav>
+          </div>
+
+          {/* Tab Content */}
+          {activeTab === 'dashboard' && (
+          <>
           <section className="mb-8">
             <div className="flex items-center justify-between">
               <div>
@@ -375,6 +450,29 @@ const AdminPage = () => {
 
           {/* Enhanced Admin Dashboard */}
           <AdminDashboard initialAnalytics={currentAnalytics} />
+          </>
+          )}
+
+
+          {/* Sales Reports Tab */}
+          {activeTab === 'sales' && (
+            <SalesReport />
+          )}
+
+          {/* Accounting Tab */}
+          {activeTab === 'accounting' && (
+            <AccountingDashboard />
+          )}
+
+          {/* VAT Tab */}
+          {activeTab === 'vat' && (
+            <VATDashboard />
+          )}
+
+          {/* Expenses Tab */}
+          {activeTab === 'expenses' && (
+            <ExpensesManager />
+          )}
         </main>
       </div>
     </div>
