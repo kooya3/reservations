@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { FileText, Download, AlertTriangle, Calculator, Calendar } from 'lucide-react';
 
 interface VATReport {
-  period: string;
+  period: string | { startDate: string; endDate: string };
   totalSales: number;
   totalVatCollected: number;
   totalPurchases: number;
@@ -86,6 +86,13 @@ export default function VATDashboard() {
   const exportITax = () => {
     if (!report) return;
     
+    // Format period for export
+    const periodValue = typeof report.period === 'string' 
+      ? report.period 
+      : report.period?.startDate 
+        ? `${report.period.startDate}_to_${report.period.endDate}`
+        : 'unknown';
+    
     const itaxData = {
       taxPeriod: report.period,
       vatCollected: report.totalVatCollected,
@@ -102,7 +109,7 @@ export default function VATDashboard() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `itax-vat-${report.period ?? "N/A"}.json`;
+    a.download = `itax-vat-${periodValue}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -216,7 +223,13 @@ export default function VATDashboard() {
               <div className="text-2xl font-bold">
                 KSh {report.totalSales?.toLocaleString() ?? 0}
               </div>
-              <div className="text-xs text-gray-500 mt-1">{report.period ?? "N/A"}</div>
+              <div className="text-xs text-gray-500 mt-1">
+                {typeof report.period === 'string' 
+                  ? report.period 
+                  : report.period?.startDate 
+                    ? `${report.period.startDate} to ${report.period.endDate}`
+                    : 'N/A'}
+              </div>
             </div>
           </div>
 
