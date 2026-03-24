@@ -13,9 +13,13 @@ interface CartSidebarProps {
 }
 
 export const CartSidebar = ({ cart, onUpdateQuantity, onRemove, onCheckout, onAddToTab }: CartSidebarProps) => {
-    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    // Prices are VAT-inclusive, no separate tax calculation needed
-    const total = subtotal;
+    // Prices are VAT-inclusive (16%)
+    // Calculate: subtotal = total / 1.16, taxAmount = subtotal × 0.16
+    const vatRate = 0.16;
+    const subtotalBeforeVat = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const subtotal = subtotalBeforeVat / (1 + vatRate);
+    const taxAmount = subtotal * vatRate;
+    const total = subtotalBeforeVat;
 
     return (
         <div className="flex h-full flex-col bg-neutral-900 border-l border-white/10 w-[400px]">
@@ -93,11 +97,12 @@ export const CartSidebar = ({ cart, onUpdateQuantity, onRemove, onCheckout, onAd
             <div className="bg-neutral-800/50 p-6 space-y-4 border-t border-white/10 backdrop-blur-sm">
                 <div className="space-y-2 text-sm">
                     <div className="flex justify-between text-neutral-400">
-                        <span>Subtotal</span>
+                        <span>Subtotal (ex VAT)</span>
                         <span>{formatCurrency(subtotal)}</span>
                     </div>
-                    <div className="text-xs text-neutral-500 italic">
-                        *Prices include VAT
+                    <div className="flex justify-between text-neutral-400">
+                        <span>VAT (16%)</span>
+                        <span className="text-amber-400">{formatCurrency(taxAmount)}</span>
                     </div>
                 </div>
 
