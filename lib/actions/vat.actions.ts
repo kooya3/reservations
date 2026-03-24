@@ -5,7 +5,6 @@ import { Query } from "node-appwrite";
 import { parseStringify } from "@/lib/utils";
 import { Order, VatCategory, VAT_RATES } from "@/types/pos.types";
 import { getInputVatSummary } from "./expense.actions";
-import { getVatFilingDeadline, calculateLateFilingPenalty } from "./vat-utils";
 
 /**
  * Kenya VAT Report Types
@@ -356,6 +355,3 @@ export async function exportVatReportForITax(
     };
   }
 }
-
-// Re-export utility functions
-export { getVatFilingDeadline, calculateLateFilingPenalty } from './vat-utils';
