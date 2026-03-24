@@ -125,16 +125,27 @@ export default function POSInterface({ initialProducts, initialCategories }: POS
 
     const filteredProducts = useMemo(() => {
         return products.filter(product => {
-            // Handle category as object (relationship) or string (ID)
-            const productCategoryId = typeof product.category === 'string'
-                ? product.category
-                : product.category?.$id || product.category?.slug;
-            const matchesCategory = selectedCategory === "all" || productCategoryId === selectedCategory;
+            // Handle category - could be ID string or object
+            let productCategorySlug = "all";
+            
+            if (typeof product.category === 'string') {
+                // Category is an ID - look it up in categoryMap
+                const cat = Array.from(categoryMap.values()).find(c => c.$id === product.category);
+                productCategorySlug = cat?.slug || product.category;
+            } else if (product.category?.$id) {
+                // Category is an object with $id
+                productCategorySlug = product.category.slug;
+            } else if (product.category?.slug) {
+                // Category is an object with just slug
+                productCategorySlug = product.category.slug;
+            }
+            
+            const matchesCategory = selectedCategory === "all" || productCategorySlug === selectedCategory;
             const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 product.description.toLowerCase().includes(searchQuery.toLowerCase());
             return matchesCategory && matchesSearch;
         });
-    }, [products, selectedCategory, searchQuery]);
+    }, [products, selectedCategory, searchQuery, categoryMap]);
 
     const handleCheckout = () => {
         setPaymentModalOpen(true);
@@ -154,10 +165,12 @@ export default function POSInterface({ initialProducts, initialCategories }: POS
             // Close payment modal
             setPaymentModalOpen(false);
 
-            // Calculate totals
-            const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-            // Prices are VAT-inclusive, no separate tax
-            const total = subtotal;
+            // Calculate totals - prices are VAT-inclusive (16%)
+            const vatRate = 0.16;
+            const subtotalBeforeVat = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            const subtotal = subtotalBeforeVat / (1 + vatRate);
+            const taxAmount = subtotal * vatRate;
+            const total = subtotalBeforeVat;
 
             // Generate short order number (max 20 chars per schema)
             const timestamp = Date.now().toString().slice(-10); // Last 10 digits
@@ -183,9 +196,9 @@ export default function POSInterface({ initialProducts, initialCategories }: POS
                 waiterName: user?.fullName || "POS System",
                 waiterId: user?.id || "system", // Clerk user ID for dashboard filtering
 
-                // Financial details
-                subtotal: subtotal,
-                taxAmount: 0, // VAT included in prices
+                // Financial details - VAT calculated from VAT-inclusive prices
+                subtotal: Math.round(subtotal * 100) / 100,
+                taxAmount: Math.round(taxAmount * 100) / 100,
                 serviceCharge: 0,
                 discountAmount: 0,
                 tipAmount: 0,

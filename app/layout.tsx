@@ -48,8 +48,8 @@ export default function RootLayout({
           )}
         >
           <ThemeProvider attribute="class" defaultTheme="dark">
-            {children}
-            <Analytics />
+          {children}
+          <Analytics />
           </ThemeProvider>
         </body>
       </html>

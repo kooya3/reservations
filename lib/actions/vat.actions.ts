@@ -125,12 +125,28 @@ export async function generateVatRemittanceReport(
       const vatCategory = order.vatCategory || 'standard';
       const vatRate = order.vatRate || VAT_RATES.STANDARD;
       
-      // Calculate VAT for this order
-      // VAT = subtotal * (vatRate / 100)
-      const orderSubtotal = order.subtotal || 0;
-      const orderVat = order.taxAmount || (orderSubtotal * (vatRate / 100));
+      // Get the total amount (VAT-inclusive)
+      const orderTotalAmount = order.totalAmount || order.total || order.grandTotal || 0;
+      
+      // Calculate VAT for this order - handle both new and legacy orders
+      let orderSubtotal: number;
+      let orderVat: number;
+      
+      if (order.taxAmount || order.vatAmount) {
+        // New orders with proper taxAmount stored
+        orderSubtotal = order.subtotal || 0;
+        orderVat = order.taxAmount || order.vatAmount || 0;
+      } else if (orderTotalAmount > 0) {
+        // Legacy orders: reverse-calculate from VAT-inclusive total
+        orderSubtotal = orderTotalAmount / 1.16;
+        orderVat = orderSubtotal * 0.16;
+      } else {
+        // Fallback: use what's available
+        orderSubtotal = order.subtotal || 0;
+        orderVat = orderSubtotal * (vatRate / 100);
+      }
+      
       const orderServiceCharge = order.serviceCharge || 0;
-      const orderTotal = order.totalAmount || orderSubtotal + orderVat + orderServiceCharge;
 
       // Add to totals
       totalSales += orderSubtotal;
@@ -176,7 +192,7 @@ export async function generateVatRemittanceReport(
         items: eTIMSItems,
         subtotal: orderSubtotal,
         vatAmount: Math.round(orderVat * 100) / 100,
-        totalAmount: Math.round(orderTotal * 100) / 100,
+        totalAmount: Math.round(orderTotalAmount * 100) / 100,
       });
     }
 
@@ -354,42 +370,4 @@ export async function exportVatReportForITax(
       error: error instanceof Error ? error.message : 'Failed to export report',
     };
   }
-}
-
-/**
- * Check VAT filing deadline (20th of following month for Kenya)
- */
-export function getVatFilingDeadline(year: number, month: number): Date {
-  // VAT is due by 20th of the following month
-  return new Date(year, month, 20);
-}
-
-/**
- * Calculate potential penalty for late filing
- * 5% penalty + 1% interest per month (KRA standard)
- */
-export function calculateLateFilingPenalty(
-  vatAmount: number,
-  daysLate: number
-): {
-  penalty: number;
-  interest: number;
-  total: number;
-} {
-  if (daysLate <= 0) {
-    return { penalty: 0, interest: 0, total: 0 };
-  }
-
-  // 5% penalty on VAT amount
-  const penalty = vatAmount * 0.05;
-  
-  // 1% interest per month (pro-rata for partial months)
-  const monthsLate = daysLate / 30;
-  const interest = vatAmount * 0.01 * Math.ceil(monthsLate);
-
-  return {
-    penalty: Math.round(penalty * 100) / 100,
-    interest: Math.round(interest * 100) / 100,
-    total: Math.round((penalty + interest) * 100) / 100,
-  };
 }

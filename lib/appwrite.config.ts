@@ -22,25 +22,18 @@ export const {
 
 const client = new sdk.Client();
 
-// Debug: Log configuration status
-console.log('🚀 Appwrite Config Debug:', {
-  endpoint: ENDPOINT ? 'Present' : 'Missing',
-  projectId: PROJECT_ID ? 'Present' : 'Missing',
-  apiKey: API_KEY ? 'Present' : 'Missing',
-  databaseId: DATABASE_ID ? 'Present' : 'Missing',
-  patientCollectionId: PATIENT_COLLECTION_ID ? 'Present' : 'Missing'
-});
+// Set default/demo values if env vars are missing to allow offline mode to work
+const safeEndpoint = ENDPOINT || 'https://cloud.appwrite.io/v1';
+const safeProjectId = PROJECT_ID || 'demo';
+const safeApiKey = API_KEY || '';
 
-if (!ENDPOINT || !PROJECT_ID || !API_KEY) {
-  console.error('❌ CRITICAL: Missing required Appwrite configuration!');
-  console.error('Check your .env.local file for:', {
-    NEXT_PUBLIC_ENDPOINT: ENDPOINT,
-    PROJECT_ID,
-    API_KEY: API_KEY ? 'Present' : 'Missing'
-  });
+client.setEndpoint(safeEndpoint).setProject(safeProjectId);
+
+if (safeApiKey) {
+  client.setKey(safeApiKey);
+} else {
+  console.warn('⚠️ API_KEY not set - running in limited/offline mode');
 }
-
-client.setEndpoint(ENDPOINT!).setProject(PROJECT_ID!).setKey(API_KEY!);
 
 export const databases = new sdk.Databases(client);
 export const users = new sdk.Users(client);

@@ -16,8 +16,12 @@ interface MobileCartProps {
 
 export function MobileCart({ cart, onUpdateQuantity, onRemove, onCheckout, onAddToTab }: MobileCartProps) {
     const [isOpen, setIsOpen] = useState(false);
-    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const total = subtotal;
+    // Prices are VAT-inclusive (16%)
+    const vatRate = 0.16;
+    const subtotalBeforeVat = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const subtotal = subtotalBeforeVat / (1 + vatRate);
+    const taxAmount = subtotal * vatRate;
+    const total = subtotalBeforeVat;
     const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
     return (
@@ -127,11 +131,12 @@ export function MobileCart({ cart, onUpdateQuantity, onRemove, onCheckout, onAdd
                 <div className="fixed bottom-0 left-0 right-0 bg-neutral-800/95 backdrop-blur-sm border-t border-white/10 p-4 space-y-4 safe-area-bottom">
                     <div className="space-y-2 text-sm">
                         <div className="flex justify-between text-neutral-400">
-                            <span>Subtotal</span>
+                            <span>Subtotal (ex VAT)</span>
                             <span>{formatCurrency(subtotal)}</span>
                         </div>
-                        <div className="text-xs text-neutral-500 italic text-center">
-                            *Prices include VAT
+                        <div className="flex justify-between text-neutral-400">
+                            <span>VAT (16%)</span>
+                            <span className="text-amber-400">{formatCurrency(taxAmount)}</span>
                         </div>
                     </div>
 

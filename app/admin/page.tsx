@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Users,
   Clock,
@@ -11,7 +11,11 @@ import {
   Utensils,
   Wine,
   AlertCircle,
-  ShoppingCart
+  ShoppingCart,
+  DollarSign,
+  Receipt,
+  Calculator,
+  Upload
 } from "lucide-react";
 import Link from "next/link";
 
@@ -23,9 +27,19 @@ import { getAdminAnalytics } from "@/lib/actions/admin.actions";
 import { useLiveReservationMetrics } from "@/lib/hooks/useLiveReservationMetrics";
 import { useLivePOSMetrics } from "@/lib/hooks/useLivePOSMetrics";
 
+// Report components
+import SalesReport from "@/components/reports/SalesReport";
+import AccountingDashboard from "@/components/reports/AccountingDashboard";
+import VATDashboard from "@/components/reports/VATDashboard";
+import ExpensesManager from "@/components/reports/ExpensesManager";
+import MenuImport from "@/components/admin/MenuImport";
+
+type TabType = 'dashboard' | 'sales' | 'accounting' | 'vat' | 'expenses' | 'import';
+
 const AdminPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [combinedAnalytics, setCombinedAnalytics] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<TabType>('dashboard');
 
   // Initialize with default data
   const defaultReservationData = {
@@ -90,6 +104,47 @@ const AdminPage = () => {
 
     loadInitialData();
   }, []);
+
+  // Keyboard shortcuts for tab navigation (1-5)
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    // Only handle if not typing in an input
+    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+      return;
+    }
+
+    switch (e.key) {
+      case '1':
+        setActiveTab('dashboard');
+        break;
+      case '2':
+        setActiveTab('sales');
+        break;
+      case '3':
+        setActiveTab('accounting');
+        break;
+      case '4':
+        setActiveTab('vat');
+        break;
+      case '5':
+        setActiveTab('expenses');
+        break;
+      case '6':
+        setActiveTab('import');
+        break;
+      // Ctrl+R to refresh data
+      case 'r':
+        if (e.ctrlKey || e.metaKey) {
+          e.preventDefault();
+          window.location.reload();
+        }
+        break;
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
 
   // Merge live data with combined analytics
   const currentAnalytics = combinedAnalytics ? {
@@ -163,7 +218,92 @@ const AdminPage = () => {
         </header>
 
         <main className="mx-auto max-w-[1600px] px-6 py-8">
-          {/* Welcome Section with Live Time */}
+          {/* Navigation Tabs */}
+          <div className="mb-6">
+            <nav className="flex gap-2 border-b border-gray-700 pb-px">
+              <button
+                onClick={() => setActiveTab('dashboard')}
+                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === 'dashboard'
+                    ? 'border-amber-500 text-amber-500'
+                    : 'border-transparent text-gray-400 hover:text-white'
+                }`}
+                title="Press 1"
+              >
+                <Activity className="w-4 h-4" />
+                Dashboard
+                <span className="text-xs text-gray-500 ml-1">1</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('sales')}
+                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === 'sales'
+                    ? 'border-amber-500 text-amber-500'
+                    : 'border-transparent text-gray-400 hover:text-white'
+                }`}
+                title="Press 2"
+              >
+                <Receipt className="w-4 h-4" />
+                Sales Reports
+                <span className="text-xs text-gray-500 ml-1">2</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('accounting')}
+                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === 'accounting'
+                    ? 'border-amber-500 text-amber-500'
+                    : 'border-transparent text-gray-400 hover:text-white'
+                }`}
+              >
+                <DollarSign className="w-4 h-4" />
+                Accounting
+                <span className="text-xs text-gray-500 ml-1">3</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('vat')}
+                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === 'vat'
+                    ? 'border-amber-500 text-amber-500'
+                    : 'border-transparent text-gray-400 hover:text-white'
+                }`}
+                title="Press 4"
+              >
+                <Calculator className="w-4 h-4" />
+                VAT
+                <span className="text-xs text-gray-500 ml-1">4</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('expenses')}
+                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === 'expenses'
+                    ? 'border-amber-500 text-amber-500'
+                    : 'border-transparent text-gray-400 hover:text-white'
+                }`}
+                title="Press 5"
+              >
+                <ShoppingCart className="w-4 h-4" />
+                Expenses
+                <span className="text-xs text-gray-500 ml-1">5</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('import')}
+                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === 'import'
+                    ? 'border-amber-500 text-amber-500'
+                    : 'border-transparent text-gray-400 hover:text-white'
+                }`}
+                title="Press 6"
+              >
+                <Upload className="w-4 h-4" />
+                Import
+                <span className="text-xs text-gray-500 ml-1">6</span>
+              </button>
+            </nav>
+          </div>
+
+          {/* Tab Content */}
+          {activeTab === 'dashboard' && (
+          <>
           <section className="mb-8">
             <div className="flex items-center justify-between">
               <div>
@@ -375,6 +515,36 @@ const AdminPage = () => {
 
           {/* Enhanced Admin Dashboard */}
           <AdminDashboard initialAnalytics={currentAnalytics} />
+          </>
+          )}
+
+
+          {/* Sales Reports Tab */}
+          {activeTab === 'sales' && (
+            <SalesReport />
+          )}
+
+          {/* Accounting Tab */}
+          {activeTab === 'accounting' && (
+            <AccountingDashboard />
+          )}
+
+          {/* VAT Tab */}
+          {activeTab === 'vat' && (
+            <VATDashboard />
+          )}
+
+          {/* Expenses Tab */}
+          {activeTab === 'expenses' && (
+            <ExpensesManager />
+          )}
+
+          {/* Import Tab */}
+          {activeTab === 'import' && (
+            <div className="bg-gray-800/50 rounded-xl border border-gray-700 p-6">
+              <MenuImport />
+            </div>
+          )}
         </main>
       </div>
     </div>
