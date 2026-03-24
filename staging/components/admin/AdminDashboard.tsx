@@ -203,17 +203,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ initialAnalytics
                 <span className="text-xs text-slate-400">
                   Data updated: {lastUpdated.toLocaleTimeString()}
                 </span>
-                <div className="flex items-center gap-2">
-                  <div className={`w-2 h-2 rounded-full ${posConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
-                  <span className="text-xs text-slate-400">
-                    POS: {posConnected ? 'Live' : 'Offline'}
-                  </span>
-                </div>
               </div>
             </div>
           </div>
 
-          <LiveSessionIndicator />
         </div>
 
         {/* Bottom Row - Controls */}
