@@ -4,11 +4,18 @@ import { generateVatRemittanceReport } from '@/lib/actions/vat.actions';
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const startDate = searchParams.get('startDate');
-    const endDate = searchParams.get('endDate');
+    let startDate = searchParams.get('startDate');
+    let endDate = searchParams.get('endDate');
     
+    // Default to current month if dates not provided
     if (!startDate || !endDate) {
-      return NextResponse.json({ error: 'startDate and endDate are required' }, { status: 400 });
+      const now = new Date();
+      const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      
+      startDate = firstDayOfMonth.toISOString().split('T')[0];
+      endDate = lastDayOfMonth.toISOString().split('T')[0];
+      console.log(`Using default date range: ${startDate} to ${endDate}`);
     }
 
     const result = await generateVatRemittanceReport({

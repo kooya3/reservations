@@ -9,8 +9,19 @@ export async function GET(request: NextRequest) {
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
     
-    if (!DATABASE_ID || !ORDERS_COLLECTION_ID || !EXPENSES_COLLECTION_ID) {
-      return NextResponse.json({ error: 'Database configuration missing' }, { status: 500 });
+    if (!DATABASE_ID || !ORDERS_COLLECTION_ID) {
+      console.error('Missing database configuration');
+      return NextResponse.json({ 
+        error: 'Database configuration missing',
+        details: 'Please check DATABASE_ID and ORDERS_COLLECTION_ID environment variables'
+      }, { status: 500 });
+    }
+
+    // Handle missing expenses collection gracefully
+    const hasExpensesCollection = EXPENSES_COLLECTION_ID && EXPENSES_COLLECTION_ID.length > 0;
+    
+    if (!hasExpensesCollection) {
+      console.warn('EXPENSES_COLLECTION_ID not configured - returning orders only');
     }
 
     const ordersQueries: any[] = [
@@ -34,11 +45,22 @@ export async function GET(request: NextRequest) {
     ordersQueries.push(Query.orderDesc('$createdAt'));
     expensesQueries.push(Query.orderDesc('$createdAt'));
 
-    // Fetch both in parallel
-    const [ordersResult, expensesResult] = await Promise.all([
-      databases.listDocuments(DATABASE_ID, ORDERS_COLLECTION_ID, ordersQueries),
-      databases.listDocuments(DATABASE_ID, EXPENSES_COLLECTION_ID, expensesQueries)
-    ]);
+    // Fetch orders (always required)
+    const ordersResult = await databases.listDocuments(
+      DATABASE_ID, 
+      ORDERS_COLLECTION_ID, 
+      ordersQueries
+    );
+
+    // Fetch expenses only if collection is configured
+    let expensesResult;
+    if (hasExpensesCollection) {
+      expensesResult = await databases.listDocuments(
+        DATABASE_ID, 
+        EXPENSES_COLLECTION_ID, 
+        expensesQueries
+      );
+    }
 
     const orders = parseStringify(ordersResult.documents);
     const expenses = parseStringify(expensesResult.documents);

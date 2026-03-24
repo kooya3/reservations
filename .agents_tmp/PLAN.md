@@ -10,6 +10,11 @@ Transform the /admin page into a comprehensive **Business Management Dashboard**
 - **Export Functionality**: Generate CSV files with all sales data for any period
 - **Financial Overview**: Real-time insights into business performance
 
+**Issues Identified from Logs:**
+- Accounting API returns 500 (EXPENSES_COLLECTION_ID not configured)
+- VAT Report API returns 400 (missing required date parameters)
+- Need more quick actions and shortcuts for managers
+
 **Problem Statement**: The current /admin page shows reservation data and basic POS metrics but lacks comprehensive sales reporting, accounting features, and VAT compliance tools that managers need for day-to-day operations and tax compliance.
 
 # 2. CONTEXT SUMMARY
@@ -53,25 +58,32 @@ The admin page will be redesigned as a tabbed/sectioned dashboard:
 
 # 4. IMPLEMENTATION STEPS
 
-## PHASE 1: Backend API Enhancements
+## PHASE 1: Fix API Errors & Backend Enhancements
 
-### Step 1.1: Create Sales Reports API (app/api/reports/sales/route.ts)
+### Step 1.1: Fix Accounting API 500 Error
+**Goal**: Fix EXPENSES_COLLECTION_ID configuration issue
+**Method**:
+- Update appwrite.config.ts to properly set EXPENSES_COLLECTION_ID from env
+- Add null checks in accounting route to handle missing config gracefully
+- Return meaningful error message instead of 500
+
+**Reference**: `app/api/reports/accounting/route.ts`, `lib/appwrite.config.ts`
+
+### Step 1.2: Fix VAT Report API 400 Error
+**Goal**: Handle missing date parameters properly
+**Method**:
+- Make startDate/endDate optional in API
+- Default to current month if not provided
+- Add better error handling
+
+**Reference**: `app/api/vat/report/route.ts`
+
+### Step 1.3: Create Sales Reports API (app/api/reports/sales/route.ts)
 **Goal**: API endpoint for filtered sales reports
 **Method**: 
-- Create new API route that accepts date range and filters
-- Filter orders by `paymentStatus = 'paid'` by default
-- Support custom date ranges
-- Include VAT breakdown per order
+- Already implemented - verify working
 
-### Step 1.2: Create Accounting Summary API (app/api/reports/accounting/route.ts)
-**Goal**: Combined income/expense report
-**Method**:
-- Fetch all paid orders for period (income)
-- Fetch all paid expenses for period
-- Calculate net profit
-- Group by category
-
-### Step 1.3: Create Expense Management API (app/api/expenses/route.ts)
+### Step 1.4: Create Expense Management API (app/api/expenses/route.ts)
 **Goal**: CRUD operations for expenses
 **Method**:
 - GET: List expenses with filters
@@ -81,9 +93,36 @@ The admin page will be redesigned as a tabbed/sectioned dashboard:
 
 ---
 
-## PHASE 2: Frontend Components
+## PHASE 2: UI Enhancements & Quick Actions
 
-### Step 2.1: Create Sales Reports Component (components/reports/SalesReport.tsx)
+### Step 2.1: Add Quick Action Shortcuts
+**Goal**: Give managers fast access to common tasks
+**Method**:
+- Quick export buttons (Today, This Week, This Month)
+- One-click CSV download for sales
+- Quick date presets in date pickers
+- Print report buttons
+
+### Step 2.2: Add Smart Date Filters
+**Goal**: Common date ranges at one click
+**Method**:
+- Today, Yesterday, This Week, Last Week
+- This Month, Last Month, This Quarter
+- Custom date range option
+- Persist last used filter
+
+### Step 2.3: Add Keyboard Shortcuts
+**Goal**: Speed up navigation for power users
+**Method**:
+- Tab switching with keyboard (1-5)
+- Quick export with Ctrl+E
+- Refresh data with Ctrl+R
+
+---
+
+## PHASE 3: Frontend Components
+
+### Step 3.1: Create Sales Reports Component (components/reports/SalesReport.tsx)
 **Goal**: Display sales with filters and export
 **Method**:
 - Date range picker
@@ -92,7 +131,7 @@ The admin page will be redesigned as a tabbed/sectioned dashboard:
 - CSV/Excel export buttons
 - Summary cards (total sales, VAT, orders count)
 
-### Step 2.2: Create Accounting Dashboard Component (components/reports/AccountingDashboard.tsx)
+### Step 3.2: Create Accounting Dashboard Component (components/reports/AccountingDashboard.tsx)
 **Goal**: Financial overview
 **Method**:
 - Income vs Expense comparison
@@ -100,7 +139,7 @@ The admin page will be redesigned as a tabbed/sectioned dashboard:
 - Category breakdown charts
 - Period comparison (this month vs last month)
 
-### Step 2.3: Create VAT Management Component (components/reports/VATDashboard.tsx)
+### Step 3.3: Create VAT Management Component (components/reports/VATDashboard.tsx)
 **Goal**: VAT compliance hub
 **Method**:
 - VAT summary cards (output VAT, input VAT, net payable)
@@ -109,7 +148,7 @@ The admin page will be redesigned as a tabbed/sectioned dashboard:
 - iTax export button
 - Filing deadline reminder
 
-### Step 2.4: Create Expenses Management Component (components/reports/ExpensesManager.tsx)
+### Step 3.4: Create Expenses Management Component (components/reports/ExpensesManager.tsx)
 **Goal**: Track and manage expenses
 **Method**:
 - Expense list with CRUD
@@ -117,7 +156,7 @@ The admin page will be redesigned as a tabbed/sectioned dashboard:
 - Status filter (pending, paid)
 - Add expense modal form
 
-### Step 2.5: Create Report Export Utility (lib/export-utils.ts)
+### Step 3.5: Create Report Export Utility (lib/export-utils.ts)
 **Goal**: Reusable export functionality
 **Method**:
 - CSV export for sales
@@ -126,9 +165,9 @@ The admin page will be redesigned as a tabbed/sectioned dashboard:
 
 ---
 
-## PHASE 3: Admin Page Redesign
+## PHASE 4: Admin Page Redesign
 
-### Step 3.1: Update /admin/page.tsx
+### Step 4.1: Update /admin/page.tsx
 **Goal**: Integrate all components into tabbed interface
 **Method**:
 - Add navigation tabs (Dashboard, Sales, Accounting, VAT, Expenses)
@@ -145,47 +184,31 @@ The admin page will be redesigned as a tabbed/sectioned dashboard:
 
 ---
 
-## PHASE 4: Features & Enhancements
-
-### Step 4.1: CSV Export for Sales
-**Goal**: Generate downloadable CSV
-**Method**:
-- Include: order ID, date, items, subtotal, VAT, total, payment method
-- Filter by date range
-- Filter by payment status
-
-### Step 4.2: VAT Remittance Report
-**Goal**: Generate formatted VAT report
-**Method**:
-- Use existing `generateVatRemittanceReport` function
-- Display in printable format
-- Include supplier invoices for input VAT
-
-### Step 4.3: Quick Actions
-**Goal**: Common tasks at fingertips
-**Method**:
-- Quick export buttons
-- Quick date presets (Today, This Week, This Month, Custom)
-- Print report button
-
 ---
 
 ## PHASE 5: Testing & Refinement
 
-### Step 5.1: Test Sales Reports
+### Step 5.1: Fix API Issues
+**Goal**: Verify APIs work correctly
+**Method**:
+- Fix accounting API 500 error
+- Fix VAT report API 400 error
+- Verify all endpoints return correct data
+
+### Step 5.2: Test Sales Reports
 **Goal**: Verify sales filtering works
 **Method**:
 - Test date range filtering
 - Test payment status filtering
 - Verify CSV export contains correct data
 
-### Step 5.2: Test Accounting Calculations
+### Step 5.3: Test Accounting Calculations
 **Goal**: Verify profit calculations
 **Method**:
 - Compare with manual calculations
 - Test edge cases (no expenses, no sales)
 
-### Step 5.3: Test VAT Reports
+### Step 5.4: Test VAT Reports
 **Goal**: Verify VAT compliance
 **Method**:
 - Test remittance generation
@@ -196,6 +219,11 @@ The admin page will be redesigned as a tabbed/sectioned dashboard:
 # 5. TESTING AND VALIDATION
 
 ### Success Criteria
+
+**API Functionality:**
+- [ ] Accounting API returns data (no 500 error)
+- [ ] VAT Report API works with default dates (no 400 error)
+- [ ] Sales API filters work correctly
 
 **Sales Reports:**
 - [ ] Filter sales by date range
