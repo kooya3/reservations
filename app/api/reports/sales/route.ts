@@ -15,8 +15,8 @@ export async function GET(request: NextRequest) {
     }
 
     const queries: any[] = [
-      Query.equal('status', 'paid'),
-      Query.notEqual('paymentStatus', 'settled'),
+      // Filter by payment status - only include paid orders
+      Query.equal('paymentStatus', 'paid'),
     ];
     
     // Filter by date range
@@ -27,6 +27,8 @@ export async function GET(request: NextRequest) {
     
     queries.push(Query.orderDesc('$createdAt'));
     queries.push(Query.limit(500));
+
+    console.log('[Sales API] Queries:', queries);
 
     const result = await databases.listDocuments(
       DATABASE_ID,
@@ -40,12 +42,25 @@ export async function GET(request: NextRequest) {
       console.log('[Sales API] First order keys:', Object.keys(orders[0]));
     }
     
-    // Calculate summary - handle multiple field name variants
+    // Calculate summary - handle multiple field name variants and legacy orders
     const totalSales = orders.reduce((sum: number, order: any) => {
       return sum + (order.total || order.totalAmount || order.grandTotal || 0);
     }, 0);
+    
+    // Calculate VAT with reverse-calculation for legacy orders
     const totalVat = orders.reduce((sum: number, order: any) => {
-      return sum + (order.vatAmount || order.taxAmount || 0);
+      const taxAmount = order.vatAmount || order.taxAmount || 0;
+      if (taxAmount > 0) {
+        // New orders with proper taxAmount
+        return sum + taxAmount;
+      }
+      // Legacy orders: reverse-calculate from totalAmount
+      const totalAmount = order.totalAmount || order.total || order.grandTotal || 0;
+      if (totalAmount > 0) {
+        const subtotal = totalAmount / 1.16;
+        return sum + (subtotal * 0.16);
+      }
+      return sum;
     }, 0);
     const orderCount = orders.length;
     
