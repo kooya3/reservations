@@ -131,7 +131,7 @@ export default function SalesReport() {
             className="bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm"
           />
           
-          <div className="flex gap-2 ml-4">
+          <div className="flex gap-2">
             {['today', 'week', 'month', 'quarter'].map((preset) => (
               <button
                 key={preset}
@@ -142,6 +142,14 @@ export default function SalesReport() {
               </button>
             ))}
           </div>
+          {startDate && endDate && (
+            <div className="ml-auto flex items-center gap-2 text-sm text-gray-400">
+              <span>Showing:</span>
+              <span className="text-amber-400 font-medium">
+                {startDate} to {endDate}
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="flex flex-wrap items-center gap-4">
@@ -194,7 +202,7 @@ export default function SalesReport() {
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Order #</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Table</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Date</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Date & Time</th>
                 <th className="px-4 py-3 text-right text-xs font-medium text-gray-300 uppercase">Subtotal</th>
                 <th className="px-4 py-3 text-right text-xs font-medium text-gray-300 uppercase">VAT</th>
                 <th className="px-4 py-3 text-right text-xs font-medium text-gray-300 uppercase">Total</th>
@@ -208,7 +216,7 @@ export default function SalesReport() {
                   <td className="px-4 py-3 font-mono text-sm">{order.orderNumber}</td>
                   <td className="px-4 py-3">{order.tableNumber || '-'}</td>
                   <td className="px-4 py-3 text-sm text-gray-400">
-                    {new Date(order.createdAt).toLocaleDateString()}
+                    {new Date(order.createdAt).toLocaleString()}
                   </td>
                   <td className="px-4 py-3 text-right">KSh {(order.subtotal || 0).toLocaleString()}</td>
                   <td className="px-4 py-3 text-right text-amber-400">KSh {(order.vatAmount || 0).toLocaleString()}</td>

@@ -30,6 +30,8 @@ export default function ExpensesManager() {
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterCategory, setFilterCategory] = useState<string>('all');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   
   // Form state
   const [formData, setFormData] = useState({
@@ -49,6 +51,8 @@ export default function ExpensesManager() {
     setLoading(true);
     try {
       const params = new URLSearchParams();
+      if (startDate) params.set('startDate', startDate);
+      if (endDate) params.set('endDate', endDate);
       if (filterStatus !== 'all') params.set('paymentStatus', filterStatus);
       if (filterCategory !== 'all') params.set('category', filterCategory);
 
@@ -64,7 +68,7 @@ export default function ExpensesManager() {
     } finally {
       setLoading(false);
     }
-  }, [filterStatus, filterCategory]);
+  }, [startDate, endDate, filterStatus, filterCategory]);
 
   useEffect(() => {
     fetchExpenses();
@@ -159,9 +163,23 @@ export default function ExpensesManager() {
       <div className="bg-gray-800 rounded-lg p-4 space-y-4">
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-gray-400" />
-            <span className="text-sm text-gray-400">Filters:</span>
+            <Calendar className="w-4 h-4 text-gray-400" />
+            <span className="text-sm text-gray-400">Date Range:</span>
           </div>
+          
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm"
+          />
+          <span className="text-gray-400">to</span>
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm"
+          />
           
           <select
             value={filterStatus}
@@ -185,6 +203,15 @@ export default function ExpensesManager() {
             ))}
           </select>
 
+          {startDate && endDate && (
+            <div className="flex items-center gap-2 text-sm text-gray-400">
+              <span>Showing:</span>
+              <span className="text-amber-400 font-medium">
+                {startDate} to {endDate}
+              </span>
+            </div>
+          )}
+          
           <button
             onClick={() => { resetForm(); setShowModal(true); }}
             className="ml-auto flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded text-sm"
@@ -205,7 +232,7 @@ export default function ExpensesManager() {
           <table className="w-full">
             <thead className="bg-gray-700">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-300">Date</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-300">Invoice Date</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-300">Supplier</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-300">Category</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-300">Description</th>
@@ -218,8 +245,8 @@ export default function ExpensesManager() {
             <tbody className="divide-y divide-gray-700">
               {expenses.map((expense) => (
                 <tr key={expense.$id} className="hover:bg-gray-750">
-                  <td className="px-4 py-3 text-sm">
-                    {new Date(expense.invoiceDate).toLocaleDateString()}
+                  <td className="px-4 py-3 text-sm text-gray-400">
+                    {expense.invoiceDate ? new Date(expense.invoiceDate).toLocaleString() : '-'}
                   </td>
                   <td className="px-4 py-3">
                     <div className="font-medium">{expense.supplierName}</div>

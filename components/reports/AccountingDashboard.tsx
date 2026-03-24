@@ -122,6 +122,14 @@ export default function AccountingDashboard() {
               </button>
             ))}
           </div>
+          {startDate && endDate && (
+            <div className="ml-auto flex items-center gap-2 text-sm text-gray-400">
+              <span>Showing:</span>
+              <span className="text-amber-400 font-medium">
+                {startDate} to {endDate}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 

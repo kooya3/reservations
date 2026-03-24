@@ -161,7 +161,7 @@ export default function VATDashboard() {
             className="bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm"
           />
           
-          <div className="flex gap-2 ml-4">
+          <div className="flex gap-2">
             {['month', 'quarter', 'year'].map((preset) => (
               <button
                 key={preset}
@@ -172,6 +172,14 @@ export default function VATDashboard() {
               </button>
             ))}
           </div>
+          {startDate && endDate && (
+            <div className="ml-auto flex items-center gap-2 text-sm text-gray-400">
+              <span>Showing:</span>
+              <span className="text-amber-400 font-medium">
+                {startDate} to {endDate}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
