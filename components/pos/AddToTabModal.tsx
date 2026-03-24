@@ -72,6 +72,13 @@ export function AddToTabModal({
       const random = Math.random().toString(36).substring(2, 6).toUpperCase();
       const shortOrderNumber = `ORD-${timestamp}-${random}`;
 
+      // Calculate VAT - prices are VAT-inclusive (16%)
+      const vatRate = 0.16;
+      const totalBeforeVat = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const subtotal = totalBeforeVat / (1 + vatRate);
+      const taxAmount = subtotal * vatRate;
+      const total = totalBeforeVat;
+
       const now = new Date().toISOString();
 
       const orderData = {
@@ -83,8 +90,8 @@ export function AddToTabModal({
         guestCount,
         waiterName: waiterName || "POS System",
         waiterId: waiterId || "system",
-        subtotal,
-        taxAmount: 0,
+        subtotal: Math.round(subtotal * 100) / 100,
+        taxAmount: Math.round(taxAmount * 100) / 100,
         serviceCharge: 0,
         discountAmount: 0,
         tipAmount: 0,
