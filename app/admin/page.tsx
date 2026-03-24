@@ -14,7 +14,8 @@ import {
   ShoppingCart,
   DollarSign,
   Receipt,
-  Calculator
+  Calculator,
+  Upload
 } from "lucide-react";
 import Link from "next/link";
 
@@ -31,8 +32,9 @@ import SalesReport from "@/components/reports/SalesReport";
 import AccountingDashboard from "@/components/reports/AccountingDashboard";
 import VATDashboard from "@/components/reports/VATDashboard";
 import ExpensesManager from "@/components/reports/ExpensesManager";
+import MenuImport from "@/components/admin/MenuImport";
 
-type TabType = 'dashboard' | 'sales' | 'accounting' | 'vat' | 'expenses';
+type TabType = 'dashboard' | 'sales' | 'accounting' | 'vat' | 'expenses' | 'import';
 
 const AdminPage = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -125,6 +127,9 @@ const AdminPage = () => {
         break;
       case '5':
         setActiveTab('expenses');
+        break;
+      case '6':
+        setActiveTab('import');
         break;
       // Ctrl+R to refresh data
       case 'r':
@@ -279,6 +284,19 @@ const AdminPage = () => {
                 <ShoppingCart className="w-4 h-4" />
                 Expenses
                 <span className="text-xs text-gray-500 ml-1">5</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('import')}
+                className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === 'import'
+                    ? 'border-amber-500 text-amber-500'
+                    : 'border-transparent text-gray-400 hover:text-white'
+                }`}
+                title="Press 6"
+              >
+                <Upload className="w-4 h-4" />
+                Import
+                <span className="text-xs text-gray-500 ml-1">6</span>
               </button>
             </nav>
           </div>
@@ -519,6 +537,13 @@ const AdminPage = () => {
           {/* Expenses Tab */}
           {activeTab === 'expenses' && (
             <ExpensesManager />
+          )}
+
+          {/* Import Tab */}
+          {activeTab === 'import' && (
+            <div className="bg-gray-800/50 rounded-xl border border-gray-700 p-6">
+              <MenuImport />
+            </div>
           )}
         </main>
       </div>

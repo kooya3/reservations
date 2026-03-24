@@ -9,13 +9,21 @@ Transform the /admin page into a comprehensive **Business Management Dashboard**
 - **VAT Compliance**: Full integration with existing VAT system for remittance reports
 - **Export Functionality**: Generate CSV files with all sales data for any period
 - **Financial Overview**: Real-time insights into business performance
+- **Menu Import**: Bulk upload products/categories via JSON file
+
+**Additional Requirements:**
+1. **VAT Calculation Fix**: Prices are VAT-inclusive (displayed price includes 16% VAT). System must reverse-calculate:
+   - If displayed price = 1500 (VAT-inclusive)
+   - `subtotal` = price / 1.16 = 1293.10 (base price without VAT)
+   - `taxAmount` = subtotal × 0.16 = 206.90 (VAT amount)
+   - `total` = subtotal + taxAmount = 1500 (VAT-inclusive total)
+   
+2. **Menu Import Feature**: Admin can upload JSON file with products, prices, and categories. System validates file, shows warnings, then bulk imports to Appwrite backend.
 
 **Issues Identified from Logs:**
 - Accounting API returns 500 (EXPENSES_COLLECTION_ID not configured)
 - VAT Report API returns 400 (missing required date parameters)
 - Need more quick actions and shortcuts for managers
-
-**Problem Statement**: The current /admin page shows reservation data and basic POS metrics but lacks comprehensive sales reporting, accounting features, and VAT compliance tools that managers need for day-to-day operations and tax compliance.
 
 # 2. CONTEXT SUMMARY
 
@@ -57,6 +65,31 @@ The admin page will be redesigned as a tabbed/sectioned dashboard:
 - Add date range pickers and filters
 
 # 4. IMPLEMENTATION STEPS
+
+## PHASE 0: Fix VAT-Inclusive Pricing Calculations
+
+### Step 0.1: Fix Cart Pricing Logic (components/pos/CartSidebar.tsx)
+**Goal**: Reverse-calculate VAT from displayed prices
+**Method**:
+- When displaying prices, they are VAT-inclusive
+- `subtotal` = displayed price / 1.16
+- `taxAmount` = subtotal × 0.16
+- `total` = displayed price (VAT-inclusive)
+
+### Step 0.2: Fix Order Creation (staging/lib/actions/pos-order.actions.ts)
+**Goal**: Calculate order totals correctly from VAT-inclusive prices
+**Method**:
+- Input: Item price (VAT-inclusive, e.g., 1500)
+- Calculate: subtotal = price / 1.16, taxAmount = subtotal × 0.16
+- Store both subtotal (ex VAT) and totalAmount (inc VAT) in database
+
+### Step 0.3: Fix POS Interface (components/pos/POSInterface.tsx)
+**Goal**: Display correct pricing breakdown
+**Method**:
+- Show base price (ex VAT), VAT amount, and total (inc VAT)
+- Update cart to show breakdown
+
+---
 
 ## PHASE 1: Fix API Errors & Backend Enhancements
 
@@ -120,61 +153,96 @@ The admin page will be redesigned as a tabbed/sectioned dashboard:
 
 ---
 
-## PHASE 3: Frontend Components
+## PHASE 3: Menu Import Feature (Bulk Upload JSON)
 
-### Step 3.1: Create Sales Reports Component (components/reports/SalesReport.tsx)
-**Goal**: Display sales with filters and export
+### Step 3.1: Create JSON Import API (app/api/menu/import/route.ts)
+**Goal**: Handle bulk menu import from JSON file
 **Method**:
-- Date range picker
-- Status filter (paid, pending, all)
-- Table view with order details
-- CSV/Excel export buttons
-- Summary cards (total sales, VAT, orders count)
+- Accept JSON file upload via POST
+- Validate JSON structure and required fields
+- Create/update categories first, then products
+- Return detailed results with success/failure counts
 
-### Step 3.2: Create Accounting Dashboard Component (components/reports/AccountingDashboard.tsx)
-**Goal**: Financial overview
+### Step 3.2: Create Menu Import Component (components/admin/MenuImport.tsx)
+**Goal**: Intuitive upload interface with validation
 **Method**:
-- Income vs Expense comparison
-- Profit margin calculation
-- Category breakdown charts
-- Period comparison (this month vs last month)
+- Drag-and-drop file upload
+- File validation before processing
+- Show preview of data to be imported
+- Display warnings for potential issues
 
-### Step 3.3: Create VAT Management Component (components/reports/VATDashboard.tsx)
-**Goal**: VAT compliance hub
+### Step 3.3: Create JSON Validation & Schema
+**Goal**: Define expected JSON structure and validation rules
 **Method**:
-- VAT summary cards (output VAT, input VAT, net payable)
-- VAT breakdown by category
-- Generate remittance report button
-- iTax export button
-- Filing deadline reminder
+- Expected format:
+```json
+{
+  "categories": [
+    { "name": "Drinks", "slug": "drinks", "description": "Beverages" }
+  ],
+  "products": [
+    { 
+      "name": "Cola", 
+      "price": 150, 
+      "category": "Drinks",
+      "description": "Soft drink",
+      "isAvailable": true
+    }
+  ]
+}
+```
+- Validate required fields
+- Check for duplicates
+- Verify category references exist
 
-### Step 3.4: Create Expenses Management Component (components/reports/ExpensesManager.tsx)
-**Goal**: Track and manage expenses
+### Step 3.4: Add Warning/Preview Modal
+**Goal**: Show potential issues before import
 **Method**:
-- Expense list with CRUD
-- Category filter
-- Status filter (pending, paid)
-- Add expense modal form
+- Parse JSON and show preview table
+- Highlight: missing fields, invalid categories, duplicate items
+- Allow user to edit/cancel before confirming
+- Show "edit guide" with correct JSON format
 
-### Step 3.5: Create Report Export Utility (lib/export-utils.ts)
-**Goal**: Reusable export functionality
+### Step 3.5: Add Import to Admin Page
+**Goal**: Integrate menu import into admin dashboard
 **Method**:
-- CSV export for sales
-- Excel export option
-- JSON export for iTax
+- Add "Import Menu" button in Products/Menu section
+- Open import modal/drawer
+- Show import history/results
 
 ---
 
-## PHASE 4: Admin Page Redesign
+## PHASE 4: Frontend Components
 
-### Step 4.1: Update /admin/page.tsx
+### Step 4.1: Create Sales Reports Component (components/reports/SalesReport.tsx)
+**Goal**: Display sales with filters and export
+**Method**:
+- Date range picker, Status filter, Table view, CSV/Excel export
+
+### Step 4.2: Create Accounting Dashboard Component (components/reports/AccountingDashboard.tsx)
+**Goal**: Financial overview - income vs expenses, profit margins
+
+### Step 4.3: Create VAT Management Component (components/reports/VATDashboard.tsx)
+**Goal**: VAT compliance hub with remittance & iTax export
+
+### Step 4.4: Create Expenses Management Component (components/reports/ExpensesManager.tsx)
+**Goal**: Track and manage expenses with CRUD
+
+### Step 4.5: Create Report Export Utility (lib/export-utils.ts)
+**Goal**: Reusable CSV, Excel, iTax export functions
+
+---
+
+## PHASE 5: Admin Page Redesign
+
+### Step 5.1: Update /admin/page.tsx
 **Goal**: Integrate all components into tabbed interface
 **Method**:
-- Add navigation tabs (Dashboard, Sales, Accounting, VAT, Expenses)
-- Implement tab switching
-- Persist selected tab in URL
+- Add navigation tabs (Dashboard, Sales, Accounting, VAT, Expenses, Import)
+- Implement tab switching with URL persistence
+- Add Menu Import button in header
 
-### Step 3.2: Add Shared UI Components
+### Step 5.2: Add Shared UI Components
 **Goal**: Consistent UI across all sections
 **Method**:
 - DateRangePicker component
@@ -219,6 +287,21 @@ The admin page will be redesigned as a tabbed/sectioned dashboard:
 # 5. TESTING AND VALIDATION
 
 ### Success Criteria
+
+**VAT Pricing Fix:**
+- [ ] Prices displayed are VAT-inclusive (1500 shown = 1500 charged)
+- [ ] Subtotal calculated as price / 1.16 (1293.10)
+- [ ] VAT calculated as subtotal × 0.16 (206.90)
+- [ ] Total = subtotal + VAT (1500)
+- [ ] Order creation stores correct values
+
+**Menu Import:**
+- [ ] JSON file upload works
+- [ ] Validation catches missing fields
+- [ ] Preview shows before import
+- [ ] Warnings display for issues
+- [ ] Products import to /pos correctly
+- [ ] Categories created automatically
 
 **API Functionality:**
 - [ ] Accounting API returns data (no 500 error)
