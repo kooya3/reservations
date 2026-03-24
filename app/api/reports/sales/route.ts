@@ -21,8 +21,12 @@ export async function GET(request: NextRequest) {
     
     // Filter by date range
     if (startDate && endDate) {
-      queries.push(Query.greaterThanEqual('$createdAt', startDate));
-      queries.push(Query.lessThanEqual('$createdAt', endDate));
+      // Use start of startDate and end of endDate for proper range filtering
+      const startDateTime = new Date(startDate).toISOString();
+      const endDateTime = new Date(endDate + 'T23:59:59.999').toISOString();
+      
+      queries.push(Query.greaterThanEqual('$createdAt', startDateTime));
+      queries.push(Query.lessThanEqual('$createdAt', endDateTime));
     }
     
     queries.push(Query.orderDesc('$createdAt'));
