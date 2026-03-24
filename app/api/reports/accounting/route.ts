@@ -9,8 +9,10 @@ export async function GET(request: NextRequest) {
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
     
+    console.log('[Accounting API] Request params:', { startDate, endDate });
+    
     if (!DATABASE_ID || !ORDERS_COLLECTION_ID) {
-      console.error('Missing database configuration');
+      console.error('[Accounting API] Missing database configuration', { DATABASE_ID, ORDERS_COLLECTION_ID });
       return NextResponse.json({ 
         error: 'Database configuration missing',
         details: 'Please check DATABASE_ID and ORDERS_COLLECTION_ID environment variables'
@@ -64,6 +66,14 @@ export async function GET(request: NextRequest) {
     }
 
     const orders = parseStringify(ordersResult.documents);
+    console.log('[Accounting API] Found orders:', orders.length, 'First order sample:', orders[0] ? {
+      $id: orders[0].$id,
+      status: orders[0].status,
+      paymentStatus: orders[0].paymentStatus,
+      total: orders[0].total,
+      totalAmount: orders[0].totalAmount,
+      createdAt: orders[0].createdAt
+    } : 'none');
     
     // Initialize expenses as empty array if collection not configured
     let expenses: any[] = [];

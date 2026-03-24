@@ -57,11 +57,12 @@ export default function SalesReport() {
   }, [fetchSales]);
 
   const exportToCSV = () => {
-    const headers = ['Order #', 'Table', 'Date', 'Subtotal', 'VAT', 'Total', 'Status', 'Payment Method'];
+    const headers = ['Order #', 'Table', 'Date', 'Time', 'Subtotal', 'VAT', 'Total', 'Status', 'Payment Method'];
     const rows = orders.map(order => [
       order.orderNumber,
       order.tableNumber || 'N/A',
-      new Date(order.createdAt).toLocaleDateString(),
+      order.createdAt ? new Date(order.createdAt).toLocaleDateString() : new Date(order.$createdAt).toLocaleDateString(),
+      order.createdAt ? new Date(order.createdAt).toLocaleTimeString() : new Date(order.$createdAt).toLocaleTimeString(),
       (order.subtotal || 0).toFixed(2),
       (order.vatAmount || 0).toFixed(2),
       (order.total || 0).toFixed(2),
@@ -216,7 +217,7 @@ export default function SalesReport() {
                   <td className="px-4 py-3 font-mono text-sm">{order.orderNumber}</td>
                   <td className="px-4 py-3">{order.tableNumber || '-'}</td>
                   <td className="px-4 py-3 text-sm text-gray-400">
-                    {new Date(order.createdAt).toLocaleString()}
+                    {order.createdAt ? new Date(order.createdAt).toLocaleString() : order.$createdAt ? new Date(order.$createdAt).toLocaleString() : '-'}
                   </td>
                   <td className="px-4 py-3 text-right">KSh {(order.subtotal || 0).toLocaleString()}</td>
                   <td className="px-4 py-3 text-right text-amber-400">KSh {(order.vatAmount || 0).toLocaleString()}</td>

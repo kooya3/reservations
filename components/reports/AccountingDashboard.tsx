@@ -21,6 +21,7 @@ interface AccountingSummary {
 export default function AccountingDashboard() {
   const [data, setData] = useState<AccountingSummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
@@ -34,8 +35,16 @@ export default function AccountingDashboard() {
       const res = await fetch(`/api/reports/accounting?${params}`);
       const result = await res.json();
       
+      // Check for API error
+      if (result.error) {
+        console.error('Accounting API error:', result.error, result.details);
+        setError(result.error);
+      }
+      
       if (result.summary) {
+        console.log('Accounting data loaded:', result.summary);
         setData(result);
+        setError(null);
       }
     } catch (error) {
       console.error('Error fetching accounting data:', error);
@@ -78,6 +87,17 @@ export default function AccountingDashboard() {
 
   if (loading) {
     return <div className="p-8 text-center text-gray-400">Loading accounting data...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="p-8 text-center">
+        <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-4 max-w-md mx-auto">
+          <p className="text-red-400 font-medium">Error: {error}</p>
+          <p className="text-gray-400 text-sm mt-2">Please check the console for more details.</p>
+        </div>
+      </div>
+    );
   }
 
   if (!data) {
