@@ -5,9 +5,29 @@ import { FileText, Download, AlertTriangle, Calculator, Calendar } from 'lucide-
 
 interface VATReport {
   period: string | { startDate: string; endDate: string };
+  salesSummary: {
+    totalSales: number;
+    totalVatCollected: number;
+    totalServiceCharge: number;
+  };
+  vatBreakdown: {
+    standard: { sales: number; vat: number };
+    zeroRated: { sales: number; vat: number };
+    exempt: { sales: number; vat: number };
+  };
+  inputVat: {
+    total: number;
+    invoices: Array<{
+      supplierName: string;
+      invoiceNumber: string;
+      amount: number;
+      vatAmount: number;
+      date: string;
+    }>;
+  };
+  netVatPayable: number;
   totalSales: number;
   totalVatCollected: number;
-  totalPurchases: number;
   totalInputVat: number;
   vatPayable: number;
   standardRatedSales: number;
@@ -20,6 +40,7 @@ interface VATReport {
     vatAmount: number;
     date: string;
   }>;
+  transactionCount?: number;
 }
 
 export default function VATDashboard() {
@@ -95,13 +116,13 @@ export default function VATDashboard() {
     
     const itaxData = {
       taxPeriod: report.period,
-      vatCollected: report.totalVatCollected,
-      vatPaid: report.totalInputVat,
-      vatPayable: report.vatPayable,
-      standardRated: report.standardRatedSales,
-      zeroRated: report.zeroRatedSales,
-      exempt: report.exemptSales,
-      supplierInvoices: report.supplierInvoices
+      vatCollected: report.salesSummary?.totalVatCollected ?? report.totalVatCollected,
+      vatPaid: report.inputVat?.total ?? report.totalInputVat,
+      vatPayable: report.netVatPayable ?? report.vatPayable,
+      standardRated: report.vatBreakdown?.standard?.sales ?? report.standardRatedSales,
+      zeroRated: report.vatBreakdown?.zeroRated?.sales ?? report.zeroRatedSales,
+      exempt: report.vatBreakdown?.exempt?.sales ?? report.exemptSales,
+      supplierInvoices: report.inputVat?.invoices ?? report.supplierInvoices
     };
     
     const json = JSON.stringify(itaxData, null, 2);
@@ -203,7 +224,12 @@ export default function VATDashboard() {
             <div className="bg-gray-800 rounded-lg p-4">
               <div className="text-sm text-gray-400 mb-1">Output VAT (Collected)</div>
               <div className="text-2xl font-bold text-emerald-400">
-                KSh {report.totalVatCollected?.toLocaleString() ?? '0'}
+                KSh {(
+                  report.salesSummary?.totalVatCollected ??
+                  report.totalVatCollected ??
+                  report.vatBreakdown?.standard?.vat ??
+                  0
+                ).toLocaleString()}
               </div>
               <div className="text-xs text-gray-500 mt-1">From sales</div>
             </div>
@@ -211,25 +237,40 @@ export default function VATDashboard() {
             <div className="bg-gray-800 rounded-lg p-4">
               <div className="text-sm text-gray-400 mb-1">Input VAT (Paid)</div>
               <div className="text-2xl font-bold text-blue-400">
-                KSh {report.totalInputVat?.toLocaleString() ?? '0'}
+                KSh {(
+                  report.inputVat?.total ??
+                  report.totalInputVat ??
+                  0
+                ).toLocaleString()}
               </div>
               <div className="text-xs text-gray-500 mt-1">From expenses</div>
             </div>
 
             <div className="bg-gray-800 rounded-lg p-4">
               <div className="text-sm text-gray-400 mb-1">Net VAT Payable</div>
-              <div className={`text-2xl font-bold ${(report.vatPayable ?? 0) >= 0 ? 'text-amber-400' : 'text-emerald-400'}`}>
-                KSh {(report.vatPayable ?? 0).toLocaleString()}
+              <div className={`text-2xl font-bold ${(
+                report.netVatPayable ?? 
+                report.vatPayable ?? 
+                0) >= 0 ? 'text-amber-400' : 'text-emerald-400'}`}>
+                KSh {(
+                  report.netVatPayable ?? 
+                  report.vatPayable ?? 
+                  0
+                ).toLocaleString()}
               </div>
               <div className="text-xs text-gray-500 mt-1">
-                {(report.vatPayable ?? 0) >= 0 ? 'Pay to KRA' : 'Claimable credit'}
+                {(report.netVatPayable ?? report.vatPayable ?? 0) >= 0 ? 'Pay to KRA' : 'Claimable credit'}
               </div>
             </div>
 
             <div className="bg-gray-800 rounded-lg p-4">
               <div className="text-sm text-gray-400 mb-1">Total Sales</div>
               <div className="text-2xl font-bold">
-                KSh {report.totalSales?.toLocaleString() ?? 0}
+                KSh {(
+                  report.salesSummary?.totalSales ??
+                  report.totalSales ??
+                  0
+                ).toLocaleString()}
               </div>
               <div className="text-xs text-gray-500 mt-1">
                 {typeof report.period === 'string' 
@@ -246,19 +287,19 @@ export default function VATDashboard() {
             <div className="bg-gray-800 rounded-lg p-4">
               <div className="text-sm text-gray-400 mb-1">Standard Rated (16%)</div>
               <div className="text-xl font-bold">
-                KSh {report.standardRatedSales?.toLocaleString() ?? 0}
+                KSh {(report.vatBreakdown?.standard?.sales ?? report.standardRatedSales ?? 0).toLocaleString()}
               </div>
             </div>
             <div className="bg-gray-800 rounded-lg p-4">
               <div className="text-sm text-gray-400 mb-1">Zero Rated (0%)</div>
               <div className="text-xl font-bold">
-                KSh {report.zeroRatedSales?.toLocaleString() ?? 0}
+                KSh {(report.vatBreakdown?.zeroRated?.sales ?? report.zeroRatedSales ?? 0).toLocaleString()}
               </div>
             </div>
             <div className="bg-gray-800 rounded-lg p-4">
               <div className="text-sm text-gray-400 mb-1">Exempt</div>
               <div className="text-xl font-bold">
-                KSh {report.exemptSales?.toLocaleString() ?? 0}
+                KSh {(report.vatBreakdown?.exempt?.sales ?? report.exemptSales ?? 0).toLocaleString()}
               </div>
             </div>
           </div>
@@ -289,7 +330,7 @@ export default function VATDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-700">
-                  {report.supplierInvoices.map((inv, i) => (
+                  {(report.inputVat?.invoices ?? report.supplierInvoices ?? []).map((inv: any, i: number) => (
                     <tr key={i} className="hover:bg-gray-750">
                       <td className="px-4 py-2">{inv.supplierName}</td>
                       <td className="px-4 py-2 font-mono text-sm">{inv.invoiceNumber}</td>

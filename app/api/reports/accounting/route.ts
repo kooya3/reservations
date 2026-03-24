@@ -66,14 +66,21 @@ export async function GET(request: NextRequest) {
     }
 
     const orders = parseStringify(ordersResult.documents);
-    console.log('[Accounting API] Found orders:', orders.length, 'First order sample:', orders[0] ? {
-      $id: orders[0].$id,
-      status: orders[0].status,
-      paymentStatus: orders[0].paymentStatus,
-      total: orders[0].total,
-      totalAmount: orders[0].totalAmount,
-      createdAt: orders[0].createdAt
-    } : 'none');
+    console.log('[Accounting API] Found orders:', orders.length);
+    if (orders.length > 0) {
+      console.log('[Accounting API] First order keys:', Object.keys(orders[0]));
+      console.log('[Accounting API] First order sample:', {
+        $id: orders[0].$id,
+        status: orders[0].status,
+        paymentStatus: orders[0].paymentStatus,
+        total: orders[0].total,
+        totalAmount: orders[0].totalAmount,
+        subtotal: orders[0].subtotal,
+        vatAmount: orders[0].vatAmount || orders[0].taxAmount,
+        serviceCharge: orders[0].serviceCharge,
+        createdAt: orders[0].createdAt
+      });
+    }
     
     // Initialize expenses as empty array if collection not configured
     let expenses: any[] = [];
@@ -81,14 +88,24 @@ export async function GET(request: NextRequest) {
       expenses = parseStringify(expensesResult.documents);
     }
     
-    // Calculate totals
-    const totalIncome = orders.reduce((sum: number, order: any) => sum + (order.total || 0), 0);
-    const totalExpenses = expenses.reduce((sum: number, exp: any) => sum + (exp.totalAmount || exp.amount || 0), 0);
+    // Calculate totals - check all possible field names
+    const totalIncome = orders.reduce((sum: number, order: any) => {
+      // Try various field names for order total
+      return sum + (order.total || order.totalAmount || order.grandTotal || 0);
+    }, 0);
+    
+    const totalExpenses = expenses.reduce((sum: number, exp: any) => {
+      return sum + (exp.totalAmount || exp.amount || 0);
+    }, 0);
     const netProfit = totalIncome - totalExpenses;
     
-    // Calculate VAT
-    const outputVat = orders.reduce((sum: number, order: any) => sum + (order.vatAmount || 0), 0);
-    const inputVat = expenses.reduce((sum: number, exp: any) => sum + (exp.vatAmount || 0), 0);
+    // Calculate VAT - check both vatAmount and taxAmount
+    const outputVat = orders.reduce((sum: number, order: any) => {
+      return sum + (order.vatAmount || order.taxAmount || 0);
+    }, 0);
+    const inputVat = expenses.reduce((sum: number, exp: any) => {
+      return sum + (exp.vatAmount || 0);
+    }, 0);
     const netVat = outputVat - inputVat;
     
     // Category breakdown for expenses
