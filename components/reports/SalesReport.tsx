@@ -64,8 +64,8 @@ export default function SalesReport() {
       order.createdAt ? new Date(order.createdAt).toLocaleDateString() : new Date(order.$createdAt).toLocaleDateString(),
       order.createdAt ? new Date(order.createdAt).toLocaleTimeString() : new Date(order.$createdAt).toLocaleTimeString(),
       (order.subtotal || 0).toFixed(2),
-      (order.vatAmount || 0).toFixed(2),
-      (order.total || 0).toFixed(2),
+      (order.vatAmount || order.taxAmount || 0).toFixed(2),
+      (order.total || order.totalAmount || order.grandTotal || 0).toFixed(2),
       order.paymentStatus,
       order.paymentMethod || 'N/A'
     ]);
