@@ -5,6 +5,7 @@ import { Query } from "node-appwrite";
 import { parseStringify } from "@/lib/utils";
 import { Order, VatCategory, VAT_RATES } from "@/types/pos.types";
 import { getInputVatSummary } from "./expense.actions";
+import { getVatFilingDeadline, calculateLateFilingPenalty } from "./vat-utils";
 
 /**
  * Kenya VAT Report Types
@@ -356,40 +357,5 @@ export async function exportVatReportForITax(
   }
 }
 
-/**
- * Check VAT filing deadline (20th of following month for Kenya)
- */
-export function getVatFilingDeadline(year: number, month: number): Date {
-  // VAT is due by 20th of the following month
-  return new Date(year, month, 20);
-}
-
-/**
- * Calculate potential penalty for late filing
- * 5% penalty + 1% interest per month (KRA standard)
- */
-export function calculateLateFilingPenalty(
-  vatAmount: number,
-  daysLate: number
-): {
-  penalty: number;
-  interest: number;
-  total: number;
-} {
-  if (daysLate <= 0) {
-    return { penalty: 0, interest: 0, total: 0 };
-  }
-
-  // 5% penalty on VAT amount
-  const penalty = vatAmount * 0.05;
-  
-  // 1% interest per month (pro-rata for partial months)
-  const monthsLate = daysLate / 30;
-  const interest = vatAmount * 0.01 * Math.ceil(monthsLate);
-
-  return {
-    penalty: Math.round(penalty * 100) / 100,
-    interest: Math.round(interest * 100) / 100,
-    total: Math.round((penalty + interest) * 100) / 100,
-  };
-}
+// Re-export utility functions
+export { getVatFilingDeadline, calculateLateFilingPenalty } from './vat-utils';
